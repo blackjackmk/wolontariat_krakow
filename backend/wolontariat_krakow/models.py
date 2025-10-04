@@ -46,7 +46,7 @@ class Uzytkownik(AbstractUser):
     rola = models.CharField(max_length=20, choices=ROLE_TYPE)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'email']
+    REQUIRED_FIELDS = ['username']
 
     def __str__(self):
         return f"{self.username} ({self.rola})"
