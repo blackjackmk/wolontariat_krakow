@@ -24,9 +24,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           id: -1,
           username,
           email: 'user@example.com',
-          haslo: '',
-          nr_telefonu: '',
+          nr_telefonu: '000000000',
           rola: 'wolontariusz',
+          organizacja: null,
         } as Uzytkownik)
     );
     // todo link api
