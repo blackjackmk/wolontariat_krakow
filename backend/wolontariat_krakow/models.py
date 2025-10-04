@@ -1,40 +1,55 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import RegexValidator
+
+
+# ---Organizacja---
+class Organizacja(models.Model):
+    telefon_validator = RegexValidator(
+        regex=r'^\d{9}$',
+        message="Numer telefonu musi składać się z dokładnie 9 cyfr."
+    )
+
+    nazwa_organizacji = models.CharField(max_length=100)
+    nr_telefonu = models.CharField(max_length=9, validators=[telefon_validator], help_text="Podaj numer telefonu składający się tylko z 9 cyfr")
+    nip = models.CharField(max_length=10, unique=True)
+    weryfikacja = models.BooleanField(default=False)
+
+    # Jeśli NIP nie jest null to organizacja zostaje pozytywnie zweryfikowana
+    def save(self, *args, **kwargs):
+        if self.nip:
+            self.weryfikacja = True
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.nazwa_organizacji
 
 
 # ---Uzytkownik---
+# Model użytkownika nie ma pola hasło, ponieważ sam AbstractUser posiada ukryte pole password i od razu je hashuje
 class Uzytkownik(AbstractUser):
+    telefon_validator = RegexValidator(
+        regex=r'^\d{9}$',
+        message="Numer telefonu musi składać się z dokładnie 9 cyfr."
+    )
+
     ROLE_TYPE = [
         ('wolontariusz', 'Wolontariusz'),
         ('koordynator', 'Koordynator'),
         ('organizacja', 'Organizacja'),
     ]
 
-    imie = models.CharField(max_length=50)
-    nazwisko = models.CharField(max_length=50)
+    username = models.CharField(max_length=50)
     email = models.EmailField(unique=True)
-    haslo = models.EmailField(max_length=20)
-    nr_telefonu = models.CharField(max_length=9)
-    nazwa_organizacji = models.CharField(max_length=100, blank=True, null=True)
+    nr_telefonu = models.CharField(max_length=9, validators=[telefon_validator], help_text="Podaj numer telefonu składający się tylko z 9 cyfr")
+    organizacja = models.ForeignKey(Organizacja, on_delete=models.SET_NULL, null=True, blank=True, related_name='uzytkownicy')
     rola = models.CharField(max_length=20, choices=ROLE_TYPE)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['imie', 'nazwisko', 'haslo', 'email']
+    REQUIRED_FIELDS = ['username', 'email']
 
     def __str__(self):
-        return f"{self.imie} {self.nazwisko} ({self.rola})"
-
-
-# ---Organizacja---
-class Organizacja(models.Model):
-    nazwa_organizacji = models.CharField(max_length=100)
-    nip = models.CharField(max_length=10, unique=True)
-    weryfikacja = models.BooleanField(default=False)
-    nr_telefonu = models.CharField(max_length=9)
-    uzytkownik = models.OneToOneField(Uzytkownik, on_delete=models.CASCADE, related_name='organizacja')
-
-    def __str__(self):
-        return self.nazwa_organizacji
+        return f"{self.username} ({self.rola})"
 
 
 # ---Projekt---
