@@ -1,49 +1,5 @@
-// --- Uzytkownicy (Users) ---
-export const mockUzytkownicy: Uzytkownik[] = [
-  {
-    id: 1,
-    username: 'jan_wolontariusz',
-    email: 'jan.kowalski@email.com',
-    haslo: 'hashed_password_123',
-    nr_telefonu: '123-456-789',
-    rola: 'wolontariusz',
-  },
-  {
-    id: 2,
-    username: 'anna_nowak',
-    email: 'anna.nowak@email.com',
-    haslo: 'hashed_password_456',
-    nr_telefonu: '987-654-321',
-    rola: 'wolontariusz',
-  },
-  {
-    id: 3,
-    username: 'koordynator_adam',
-    email: 'adam.koordynator@pomocna-dlpon.org',
-    haslo: 'hashed_password_789',
-    nr_telefonu: '555-444-333',
-    nazwa_organizacji: 'Pomocna Dłoń',
-    rola: 'koordynator',
-  },
-  {
-    id: 4,
-    username: 'pomocna_dlon_org',
-    email: 'kontakt@pomocna-dpon.org',
-    haslo: 'hashed_password_org1',
-    nr_telefonu: '111-222-333',
-    nazwa_organizacji: 'Pomocna Dłoń',
-    rola: 'organizacja',
-  },
-  {
-    id: 5,
-    username: 'serce_dla_zwierzat',
-    email: 'kontakt@serce-dla-zwierzat.pl',
-    haslo: 'hashed_password_org2',
-    nr_telefonu: '222-333-444',
-    nazwa_organizacji: 'Serce dla Zwierząt',
-    rola: 'organizacja',
-  },
-];
+// To satisfy circular relations we create organizations first,
+// then users that may reference them, and finally complete reverse links.
 
 // --- Organizacje (Organizations) ---
 export const mockOrganizacje: Organizacja[] = [
@@ -52,18 +8,64 @@ export const mockOrganizacje: Organizacja[] = [
     nazwa_organizacji: 'Pomocna Dłoń',
     nip: '1234567890',
     weryfikacja: true,
-    nr_telefonu: '111-222-333',
-    uzytkownik: mockUzytkownicy[3], // Relacja do uzytkownik 'pomocna_dlon_org'
+    nr_telefonu: '111222333',
   },
   {
     id: 2,
     nazwa_organizacji: 'Serce dla Zwierząt',
     nip: '0987654321',
     weryfikacja: false,
-    nr_telefonu: '222-333-444',
-    uzytkownik: mockUzytkownicy[4], // Relacja do uzytkownik 'serce_dla_zwierzat'
+    nr_telefonu: '222333444',
   },
 ];
+
+// --- Uzytkownicy (Users) ---
+export const mockUzytkownicy: Uzytkownik[] = [
+  {
+    id: 1,
+    username: 'jan_wolontariusz',
+    email: 'jan.kowalski@email.com',
+    nr_telefonu: '123456789',
+    rola: 'wolontariusz',
+    organizacja: null,
+  },
+  {
+    id: 2,
+    username: 'anna_nowak',
+    email: 'anna.nowak@email.com',
+    nr_telefonu: '987654321',
+    rola: 'wolontariusz',
+    organizacja: null,
+  },
+  {
+    id: 3,
+    username: 'koordynator_adam',
+    email: 'adam.koordynator@pomocna-dlpon.org',
+    nr_telefonu: '555444333',
+    rola: 'koordynator',
+    organizacja: mockOrganizacje[0],
+  },
+  {
+    id: 4,
+    username: 'pomocna_dlon_org',
+    email: 'kontakt@pomocna-dpon.org',
+    nr_telefonu: '111222333',
+    rola: 'organizacja',
+    organizacja: mockOrganizacje[0],
+  },
+  {
+    id: 5,
+    username: 'serce_dla_zwierzat',
+    email: 'kontakt@serce-dla-zwierzat.pl',
+    nr_telefonu: '222333444',
+    rola: 'organizacja',
+    organizacja: mockOrganizacje[1],
+  },
+];
+
+// complete reverse relations
+mockOrganizacje[0].uzytkownicy = mockUzytkownicy.filter(u => u.organizacja?.id === 1);
+mockOrganizacje[1].uzytkownicy = mockUzytkownicy.filter(u => u.organizacja?.id === 2);
 
 // --- Projekty (Projects) ---
 export const mockProjekty: Projekt[] = [
@@ -94,7 +96,7 @@ export const mockOferty: Oferta[] = [
     organizacja: mockOrganizacje[0],
     projekt: mockProjekty[0],
     tytul_oferty: 'Pomoc przy sortowaniu darów - 10.12.2025',
-    wolontariusz: mockUzytkownicy[0], // Jan Wolontariusz
+    wolontariusz: mockUzytkownicy[0],
     czy_ukonczone: true,
   },
   {
@@ -110,7 +112,7 @@ export const mockOferty: Oferta[] = [
     organizacja: mockOrganizacje[1],
     projekt: mockProjekty[2],
     tytul_oferty: 'Spacer z psami w schronisku - weekendy',
-    wolontariusz: mockUzytkownicy[1], // Anna Nowak
+    wolontariusz: mockUzytkownicy[1],
     czy_ukonczone: false,
   },
   {
