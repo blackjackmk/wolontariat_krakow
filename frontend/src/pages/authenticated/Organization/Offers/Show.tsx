@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Pencil, ArrowLeft } from 'lucide-react';
 import { getOffers } from '@/api/offers';
 
 export default function OrganizationOffersShowPage() {
@@ -21,10 +23,13 @@ export default function OrganizationOffersShowPage() {
       <div className="text-sm">Status: {offer.czy_ukonczone ? 'Ukończone' : 'Otwarte'}</div>
       <div className="text-sm">Wolontariusz: {offer.wolontariusz ? offer.wolontariusz.username : 'Brak'}</div>
       <div className="mt-4 flex gap-2">
-        <Link className="px-3 py-1 text-sm rounded border" to={`/organization/offers/${offer.id}/edit`}>Edytuj</Link>
-        <Link className="px-3 py-1 text-sm rounded border" to={`/organization/offers`}>Wróć</Link>
+        <Button asChild>
+          <Link to={`/organization/offers/${offer.id}/edit`}><Pencil /> Edytuj</Link>
+        </Button>
+        <Button asChild variant="outline">
+          <Link to={`/organization/offers`}><ArrowLeft /> Wróć</Link>
+        </Button>
       </div>
     </div>
   );
 }
-

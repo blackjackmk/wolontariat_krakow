@@ -5,6 +5,8 @@ import { getProjects } from '@/api/projects';
 import { getUsers } from '@/api/users';
 import { Link } from 'react-router-dom';
 import { mockOferty } from '@/mock-data/data';
+import { Button } from '@/components/ui/button';
+import { Plus, Eye, Pencil, Trash2 } from 'lucide-react';
 
 export default function OrganizationOffersListPage() {
   const { user } = useAuth();
@@ -39,7 +41,9 @@ export default function OrganizationOffersListPage() {
       <h1 className="text-2xl font-semibold mb-4">Oferty Organizacji</h1>
 
       <div className="mb-4">
-        <Link className="inline-block px-3 py-2 rounded border" to="/organization/offers/create">Dodaj nową ofertę</Link>
+        <Button asChild>
+          <Link to="/organization/offers/create"><Plus /> Dodaj nową ofertę</Link>
+        </Button>
       </div>
 
       <ul className="space-y-3">
@@ -50,13 +54,19 @@ export default function OrganizationOffersListPage() {
             <div className="text-sm">Status: {o.czy_ukonczone ? 'Ukończone' : 'Otwarte'}</div>
             <div className="text-sm">Wolontariusz: {o.wolontariusz ? o.wolontariusz.username : 'Brak'}</div>
             <div className="mt-2 flex gap-2">
-              <Link className="px-3 py-1 text-sm rounded border" to={`/organization/offers/${o.id}`}>Pokaż</Link>
-              <Link className="px-3 py-1 text-sm rounded border" to={`/organization/offers/${o.id}/edit`}>Edytuj</Link>
-              <button className="px-3 py-1 text-sm rounded border text-red-600 border-red-300" onClick={() => {
+              <Button asChild variant="outline">
+                <Link to={`/organization/offers/${o.id}`}><Eye /> Pokaż</Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link to={`/organization/offers/${o.id}/edit`}><Pencil /> Edytuj</Link>
+              </Button>
+              <Button variant="destructive" onClick={() => {
                 setOffers(prev => prev.filter(x => x.id !== o.id));
                 const idx = mockOferty.findIndex(x => x.id === o.id);
                 if (idx >= 0) mockOferty.splice(idx, 1);
-              }}>Usuń</button>
+              }}>
+                <Trash2 /> Usuń
+              </Button>
             </div>
           </li>
         ))}
