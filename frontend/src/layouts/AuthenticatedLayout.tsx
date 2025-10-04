@@ -1,34 +1,68 @@
 import { Link, Outlet } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import Logo from '@/components/ui/logo';
+import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+import { Menu, X } from 'lucide-react';
 
 export default function AuthenticatedLayout() {
   const { user, logout } = useAuth();
+  const [open, setOpen] = useState(false);
+
+  const NavLinks = () => (
+    <>
+      <Link className="text-gray-700 hover:text-black" to="/dashboard" onClick={() => setOpen(false)}>Dashboard</Link>
+      {user?.rola === 'wolontariusz' && (
+        <Link className="text-gray-700 hover:text-black" to="/volunteer/offers" onClick={() => setOpen(false)}>Oferty</Link>
+      )}
+      {user?.rola === 'koordynator' && (
+        <Link className="text-gray-700 hover:text-black" to="/coordinator/projects" onClick={() => setOpen(false)}>Projekty</Link>
+      )}
+      {user?.rola === 'organizacja' && (
+        <Link className="text-gray-700 hover:text-black" to="/organization/projects" onClick={() => setOpen(false)}>Projekty</Link>
+      )}
+      <button className="text-gray-700 hover:text-black" onClick={() => { setOpen(false); logout(); }}>Wyloguj</button>
+    </>
+  );
+
   return (
     <div className="min-h-screen bg-gray-100 text-gray-900">
-      <header className="border-b bg-white">
+      <header className="sticky top-0 z-40 border-b bg-white">
         <div className="mx-auto max-w-5xl px-4 py-3 flex items-center gap-4">
-          <Link to="/">
+          <Link to="/" className="shrink-0">
             <Logo />
           </Link>
-          <nav className="ml-auto flex items-center gap-4">
-            <Link className="text-gray-700 hover:text-black" to="/dashboard">Dashboard</Link>
-            {user?.rola === 'wolontariusz' && (
-              <Link className="text-gray-700 hover:text-black" to="/volunteer/offers">Oferty</Link>
-            )}
-            {user?.rola === 'koordynator' && (
-              <Link className="text-gray-700 hover:text-black" to="/coordinator/projects">Projekty</Link>
-            )}
-            {user?.rola === 'organizacja' && (
-              <Link className="text-gray-700 hover:text-black" to="/organization/projects">Projekty</Link>
-            )}
-            <button className="text-gray-700 hover:text-black" onClick={logout}>Wyloguj</button>
+          {/* Desktop nav */}
+          <nav className="ml-auto hidden md:flex items-center gap-4">
+            <NavLinks />
           </nav>
+          {/* Mobile trigger */}
+          <div className="ml-auto md:hidden">
+            <Button variant="outline" size="icon" onClick={() => setOpen(true)} aria-label="Otwórz menu">
+              <Menu />
+            </Button>
+          </div>
         </div>
       </header>
       <main className="mx-auto max-w-5xl px-4 py-6">
         <Outlet />
       </main>
+
+      {/* Mobile modal menu */}
+      {open && (
+        <div className="fixed inset-0 z-50">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setOpen(false)} />
+          <div className="absolute right-0 top-0 h-full w-72 bg-white shadow-xl p-4 flex flex-col gap-3">
+            <div className="flex items-center justify-between mb-2">
+              <div className="font-semibold">Menu</div>
+              <Button variant="ghost" size="icon" onClick={() => setOpen(false)} aria-label="Zamknij">
+                <X />
+              </Button>
+            </div>
+            <NavLinks />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
