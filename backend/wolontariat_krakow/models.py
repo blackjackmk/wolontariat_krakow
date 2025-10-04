@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
+from django.utils import timezone
 
 
 # ---Organizacja---
@@ -70,7 +71,7 @@ class Oferta(models.Model):
     projekt = models.ForeignKey(Projekt, on_delete=models.CASCADE, related_name='oferty')
     tytul_oferty = models.CharField(max_length=100)
     lokalizacja = models.CharField(max_length=100)
-    data_wyslania = models.DateTimeField()
+    data_wyslania = models.DateTimeField(default=timezone.now())
     wolontariusz = models.ForeignKey(Uzytkownik, on_delete=models.SET_NULL, null=True, blank=True, related_name='oferty')
     czy_ukonczone = models.BooleanField(default=False)
 

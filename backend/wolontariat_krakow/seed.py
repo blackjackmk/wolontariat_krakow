@@ -79,22 +79,22 @@ print("Dodano 5 projektów")
 
 # --- Oferty ---
 oferty_dane = [
-    ("Pomoc w schronisku", "Kraków, Azory"),
-    ("Warsztaty ekologiczne", "Kraków, Balice"),
-    ("Zbiórka żywności", "Kraków, Stary rynek"),
-    ("Sprzątanie lasu", "Kraków"),
-    ("Pomoc w domu dziecka", "Kraków"),
+    ("Pomoc w schronisku"),
+    ("Warsztaty ekologiczne"),
+    ("Zbiórka żywności"),
+    ("Sprzątanie lasu"),
+    ("Pomoc w domu dziecka"),
 ]
 
 oferty = []
-for tytul, lokalizacja in oferty_dane:
+for tytul in oferty_dane:
     losowa_data = timezone.now() - timedelta(days=random.randint(0, 10))
     oferty.append(
         Oferta.objects.create(
             organizacja=random.choice(organizacje),
             projekt=random.choice(projekty),
             tytul_oferty=tytul,
-            lokalizacja=lokalizacja,
+            lokalizacja="Krakow",
             data_wyslania=losowa_data,
             wolontariusz=random.choice(uzytkownicy),
             czy_ukonczone=random.choice([True, False])

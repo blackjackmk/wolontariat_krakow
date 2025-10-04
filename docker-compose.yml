@@ -12,24 +12,24 @@ services:
     depends_on:
       - db
 
-  frontend:
-    build:
-      context: ./frontend
-      target: dev
-    container_name: react-frontend
-    working_dir: /app
-    user: "${UID}:${GID}"
-    volumes:
-      - ./frontend:/app
-    command: sh -c "npm run dev"
-    ports:
-      - "3000:3000"
-    stdin_open: true
-    tty: true
-    environment:
-      - NODE_ENV=development
-    depends_on:
-      - backend
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     target: dev
+  #   container_name: react-frontend
+  #   working_dir: /app
+  #   user: "${UID}:${GID}"
+  #   volumes:
+  #     - ./frontend:/app
+  #   command: sh -c "npm run dev"
+  #   ports:
+  #     - "3000:3000"
+  #   stdin_open: true
+  #   tty: true
+  #   environment:
+  #     - NODE_ENV=development
+  #   depends_on:
+  #     - backend
 
   db:
     image: postgres:16
