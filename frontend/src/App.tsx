@@ -1,29 +1,46 @@
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import Home from './pages/Home';
-import About from './pages/About';
-import NotFound from './pages/NotFound';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Home from './pages/guest/Home/Index';
+import About from './pages/guest/About/Index';
+import NotFound from './pages/NotFound/Index';
+import Dashboard from './pages/authenticated/Dashboard/Index';
+import Profile from './pages/authenticated/Profile/Index';
+import GuestLayout from './layouts/GuestLayout';
+import AuthenticatedLayout from './layouts/AuthenticatedLayout';
+import ProtectedRoute from './components/ProtectedRoute';
+import Login from './pages/guest/Login/Index';
+import Register from './pages/guest/Register/Index';
+import { AuthProvider } from './hooks/useAuth';
 
 export default function App() {
+
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-gray-50 text-gray-900">
-        <header className="border-b bg-white">
-          <div className="mx-auto max-w-5xl px-4 py-3 flex items-center gap-4">
-            <Link to="/" className="font-semibold text-lg">Wolontariat Kraków</Link>
-            <nav className="ml-auto flex items-center gap-4">
-              <Link className="text-gray-700 hover:text-black" to="/">Home</Link>
-              <Link className="text-gray-700 hover:text-black" to="/about">About</Link>
-            </nav>
-          </div>
-        </header>
-        <main className="mx-auto max-w-5xl px-4 py-6">
-          <Routes>
+      <AuthProvider>
+        <Routes>
+          {/* Guest routes */}
+          <Route element={<GuestLayout />}>
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </main>
-      </div>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+          </Route>
+
+          {/* Authenticated routes */}
+          <Route
+            element={
+              <ProtectedRoute>
+                <AuthenticatedLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/profile" element={<Profile />} />
+          </Route>
+
+          {/* Fallback */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   );
 }
