@@ -2,13 +2,8 @@ import { createContext, useContext, useState, ReactNode, useEffect } from "react
 import { useNavigate } from "react-router-dom";
 // import api from "../api/axios";
 
-interface User {
-  username: string;
-  email?: string;
-}
-
 interface AuthContextType {
-  user: User | null;
+  user: Uzytkownik | null;
   login: (username: string, password: string) => Promise<void>;
   logout: () => void;
 }
@@ -17,13 +12,13 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate();
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<Uzytkownik | null>(null);
 
   const login = async (username: string, password: string) => {
     setUser({
         username: username,
         email: 'user@example.com'
-    });
+    } as Uzytkownik);
     // todo link api
     // const res = await api.post("token/", { username, password });
     // localStorage.setItem("access", res.data.access);
