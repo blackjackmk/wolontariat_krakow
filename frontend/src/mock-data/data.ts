@@ -61,6 +61,22 @@ export const mockUzytkownicy: Uzytkownik[] = [
     rola: 'organizacja',
     organizacja: mockOrganizacje[1],
   },
+  {
+    id: 6,
+    username: 'ola_mloda',
+    email: 'ola.mloda@example.com',
+    nr_telefonu: '333222111',
+    rola: 'wolontariusz',
+    organizacja: null,
+  },
+  {
+    id: 7,
+    username: 'kuba_student',
+    email: 'kuba.student@example.com',
+    nr_telefonu: '444555666',
+    rola: 'wolontariusz',
+    organizacja: null,
+  },
 ];
 
 // complete reverse relations
@@ -98,6 +114,12 @@ export const mockOferty: Oferta[] = [
     tytul_oferty: 'Pomoc przy sortowaniu darów - 10.12.2025',
     wolontariusz: mockUzytkownicy[0],
     czy_ukonczone: true,
+    lokalizacja: 'Kraków',
+    czas_trwania: 'Jednorazowe (1 dzień)',
+    wymagania: ['chęci', 'dokładność'],
+    temat: 'Pomoc społeczna',
+    liczba_uczestnikow: 12,
+    limit_uczestnikow: 15,
   },
   {
     id: 2,
@@ -106,6 +128,12 @@ export const mockOferty: Oferta[] = [
     tytul_oferty: 'Korepetytor z matematyki (szkoła podstawowa)',
     wolontariusz: null,
     czy_ukonczone: false,
+    lokalizacja: 'Kraków',
+    czas_trwania: '2-4h tygodniowo',
+    wymagania: ['cierpliwość', 'podstawy matematyki'],
+    temat: 'Edukacja',
+    liczba_uczestnikow: 4,
+    limit_uczestnikow: 8,
   },
   {
     id: 3,
@@ -114,6 +142,12 @@ export const mockOferty: Oferta[] = [
     tytul_oferty: 'Spacer z psami w schronisku - weekendy',
     wolontariusz: mockUzytkownicy[1],
     czy_ukonczone: false,
+    lokalizacja: 'Wieliczka',
+    czas_trwania: 'Weekendowo (3h)',
+    wymagania: ['miłość do zwierząt'],
+    temat: 'Zwierzęta',
+    liczba_uczestnikow: 6,
+    limit_uczestnikow: 10,
   },
   {
     id: 4,
@@ -122,6 +156,12 @@ export const mockOferty: Oferta[] = [
     tytul_oferty: 'Pomoc w transporcie zwierząt do weterynarza',
     wolontariusz: null,
     czy_ukonczone: false,
+    lokalizacja: 'Kraków',
+    czas_trwania: 'Dorywczo',
+    wymagania: ['prawo jazdy', 'punktualność'],
+    temat: 'Transport',
+    liczba_uczestnikow: 2,
+    limit_uczestnikow: 5,
   },
 ];
 

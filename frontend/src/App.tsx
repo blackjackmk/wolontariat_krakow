@@ -21,6 +21,7 @@ import OrganizationOffersListPage from './pages/authenticated/Organization/Offer
 import OrganizationOffersCreatePage from './pages/authenticated/Organization/Offers/Create';
 import OrganizationOffersEditPage from './pages/authenticated/Organization/Offers/Edit';
 import OrganizationOffersShowPage from './pages/authenticated/Organization/Offers/Show';
+import VolunteerOfferShowPage from './pages/authenticated/Volunteer/Offers/Show';
 
 export default function App() {
 
@@ -53,6 +54,14 @@ export default function App() {
               element={
                 <RoleRoute allow={["wolontariusz"]}>
                   <VolunteerOffersPage />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="/volunteer/offers/:id"
+              element={
+                <RoleRoute allow={["wolontariusz"]}>
+                  <VolunteerOfferShowPage />
                 </RoleRoute>
               }
             />

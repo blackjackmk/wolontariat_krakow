@@ -51,6 +51,13 @@ type Oferta = {
   tytul_oferty: string;
   wolontariusz?: Uzytkownik | null; // Optional (nullable)
   czy_ukonczone: boolean;
+  // additional placeholder fields for UI/filters
+  lokalizacja?: string;
+  czas_trwania?: string; // e.g., "2-4h tygodniowo"
+  wymagania?: string[];
+  temat?: string; // topic/category
+  liczba_uczestnikow?: number;
+  limit_uczestnikow?: number;
 };
 
 // --- Wiadomosc ---
