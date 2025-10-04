@@ -21,7 +21,7 @@ services:
     user: "${UID}:${GID}"
     volumes:
       - ./frontend:/app
-    command: sh -c "npm ci && npm run dev"
+    command: sh -c "npm run dev"
     ports:
       - "3000:3000"
     stdin_open: true

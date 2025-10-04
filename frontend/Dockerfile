@@ -1,15 +1,12 @@
-# Base stage for dependencies
-FROM node:18-alpine AS base
+FROM node:18-bullseye AS base
 WORKDIR /app
 COPY package*.json ./
 
-# Dev stage
 FROM base AS dev
 RUN npm install --include=dev
 COPY . .
 CMD ["npm", "run", "dev"]
 
-# Prod stage
 FROM base AS prod
 RUN npm install
 COPY . .
