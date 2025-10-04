@@ -2,5 +2,20 @@
 HackYeah 2025 Wilki Morskie PM Szczecin
 
 # Setup
-`cp .env.example .env`
-`docker-compose up -d`
+#### 1. Clone the repository
+```bash
+git clone https://github.com/yourusername/financepocket.git
+cd financepocket
+```
+#### 2. Copy the environment config
+```bash
+cp .env.example .env
+```
+#### 3. Edit `.env` with your own values
+
+#### 4. Start the application
+```bash
+docker-compose up -d
+```
+
+#### 5. Open http://localhost:8000 in your browser
