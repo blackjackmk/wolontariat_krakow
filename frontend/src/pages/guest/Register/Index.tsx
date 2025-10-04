@@ -40,7 +40,7 @@ export default function Register() {
     return (
         <div>
             <Card>
-                <CardHeader>
+                <CardHeader className="text-lg font-semibold">
                     Rejestracja
                 </CardHeader>
                 <CardContent>

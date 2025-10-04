@@ -7,9 +7,13 @@ import Profile from './pages/authenticated/Profile/Index';
 import GuestLayout from './layouts/GuestLayout';
 import AuthenticatedLayout from './layouts/AuthenticatedLayout';
 import ProtectedRoute from './components/ProtectedRoute';
+import RoleRoute from './components/RoleRoute';
 import Login from './pages/guest/Login/Index';
 import Register from './pages/guest/Register/Index';
 import { AuthProvider } from './hooks/useAuth';
+import VolunteerOffersPage from './pages/authenticated/Volunteer/Offers/Index';
+import CoordinatorProjectsPage from './pages/authenticated/Coordinator/Projects/Index';
+import OrganizationProjectsPage from './pages/authenticated/Organization/Projects/Index';
 
 export default function App() {
 
@@ -35,6 +39,32 @@ export default function App() {
           >
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/profile" element={<Profile />} />
+
+            {/* Role-specific routes */}
+            <Route
+              path="/volunteer/offers"
+              element={
+                <RoleRoute allow={["wolontariusz"]}>
+                  <VolunteerOffersPage />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="/coordinator/projects"
+              element={
+                <RoleRoute allow={["koordynator"]}>
+                  <CoordinatorProjectsPage />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="/organization/projects"
+              element={
+                <RoleRoute allow={["organizacja"]}>
+                  <OrganizationProjectsPage />
+                </RoleRoute>
+              }
+            />
           </Route>
 
           {/* Fallback */}

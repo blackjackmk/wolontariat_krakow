@@ -3,6 +3,7 @@ import { SubmitButton } from "@/components/ui/autoform/components/SubmitButton";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { ZodProvider, fieldConfig } from "@autoform/zod";
+import { Link } from "react-router-dom";
 import z from "zod";
 
 const schema = z.object({
@@ -32,7 +33,7 @@ export default function Register() {
     return (
         <div>
             <Card>
-                <CardHeader>
+                <CardHeader className="text-lg font-semibold">
                     Zaloguj się
                 </CardHeader>
                 <CardContent>
@@ -44,6 +45,9 @@ export default function Register() {
                             login(data.username, data.password);
                         }}
                     >
+                        <p>
+                            Nie masz konta? <Link className="text-primary hover:underline" to="/register">Zarejestruj się</Link> na tej stronie
+                        </p>
                         <SubmitButton>
                             Zaloguj się
                         </SubmitButton>

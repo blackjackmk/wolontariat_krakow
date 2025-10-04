@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 // import api from "../api/axios";
+import { findUserByUsername } from "@/api/users";
 
 interface AuthContextType {
   user: Uzytkownik | null;
@@ -15,10 +16,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<Uzytkownik | null>(null);
 
   const login = async (username: string, password: string) => {
-    setUser({
-        username: username,
-        email: 'user@example.com'
-    } as Uzytkownik);
+    // TODO: replace with real auth and profile fetch
+    const mock = await findUserByUsername(username);
+    setUser(
+      mock ||
+        ({
+          id: -1,
+          username,
+          email: 'user@example.com',
+          haslo: '',
+          nr_telefonu: '',
+          rola: 'wolontariusz',
+        } as Uzytkownik)
+    );
     // todo link api
     // const res = await api.post("token/", { username, password });
     // localStorage.setItem("access", res.data.access);
