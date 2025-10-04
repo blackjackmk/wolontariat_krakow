@@ -46,6 +46,10 @@ class Uzytkownik(AbstractUser):
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
+<<<<<<< HEAD
+=======
+
+>>>>>>> 39674fa (Migrations)
     def __str__(self):
         return f"{self.username} ({self.rola})"
 
