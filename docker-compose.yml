@@ -18,7 +18,6 @@ services:
       target: dev
     container_name: react-frontend
     working_dir: /app
-    user: "${UID}:${GID}"
     volumes:
       - ./frontend:/app
       - /app/node_modules
