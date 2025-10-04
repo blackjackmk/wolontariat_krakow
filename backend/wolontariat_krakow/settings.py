@@ -28,7 +28,13 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-fallback-key-change-this-i
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', '1') == '1'
 
-ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,0.0.0.0').split(',')
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '0.0.0.0',
+    'backend',  # nazwa serwisu z docker-compose
+    'django-backend',  # nazwa kontenera
+]
 
 # Application definition
 INSTALLED_APPS = [
@@ -41,7 +47,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'wolontariat_krakow',
     'api',
-    'corsheaders'
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -118,8 +124,8 @@ STATIC_URL = 'static/'
 
 # CORS Configuration
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
+    "http://localhost:3030",
+    "http://127.0.0.1:3030",
     "http://localhost:8080",
     "http://127.0.0.1:8080",
 ]
