@@ -1,25 +1,29 @@
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import Home from './pages/Home';
+import About from './pages/About';
+import NotFound from './pages/NotFound';
 
-function App() {
+export default function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <div className="min-h-screen bg-gray-50 text-gray-900">
+        <header className="border-b bg-white">
+          <div className="mx-auto max-w-5xl px-4 py-3 flex items-center gap-4">
+            <Link to="/" className="font-semibold text-lg">Wolontariat Kraków</Link>
+            <nav className="ml-auto flex items-center gap-4">
+              <Link className="text-gray-700 hover:text-black" to="/">Home</Link>
+              <Link className="text-gray-700 hover:text-black" to="/about">About</Link>
+            </nav>
+          </div>
+        </header>
+        <main className="mx-auto max-w-5xl px-4 py-6">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </main>
+      </div>
+    </BrowserRouter>
   );
 }
-
-export default App;
