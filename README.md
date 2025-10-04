@@ -4,7 +4,7 @@ HackYeah 2025 Wilki Morskie PM Szczecin
 # Setup
 #### 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/financepocket.git
+git clone https://github.com/blackjackmk/wolontariat_krakow.git
 cd financepocket
 ```
 #### 2. Copy the environment config
