@@ -30,6 +30,10 @@ class Organizacja(models.Model):
 class Uzytkownik(AbstractUser):
     telefon_validator = RegexValidator(regex=r'^\d{9}$', message="Numer telefonu musi składać się z dokładnie 9 cyfr.")
 
+    # ✅ WAŻNE: Email musi być unique gdy używasz go jako USERNAME_FIELD
+    email = models.EmailField(unique=True)
+    
+
     nr_telefonu = models.CharField(
         max_length=9, validators=[telefon_validator],
         help_text="Podaj numer telefonu składający się tylko z 9 cyfr"
