@@ -26,28 +26,27 @@ class Organizacja(models.Model):
 
 
 # ---Uzytkownik---
-# Model użytkownika nie ma pola hasło, ponieważ sam AbstractUser posiada ukryte pole password i od razu je hashuje
+# Pola username, email, password są brane z AbstractUser i nie są widoczne w modelu
 class Uzytkownik(AbstractUser):
-    telefon_validator = RegexValidator(
-        regex=r'^\d{9}$',
-        message="Numer telefonu musi składać się z dokładnie 9 cyfr."
+    telefon_validator = RegexValidator(regex=r'^\d{9}$', message="Numer telefonu musi składać się z dokładnie 9 cyfr.")
+    
+    nr_telefonu = models.CharField(
+        max_length=9, validators=[telefon_validator], 
+        help_text="Podaj numer telefonu składający się tylko z 9 cyfr"
     )
-
+    organizacja = models.ForeignKey(
+        Organizacja, on_delete=models.SET_NULL, null=True, blank=True, related_name='uzytkownicy'
+    )
     ROLE_TYPE = [
         ('wolontariusz', 'Wolontariusz'),
         ('koordynator', 'Koordynator'),
         ('organizacja', 'Organizacja'),
     ]
-
-    username = models.CharField(max_length=50)
-    email = models.EmailField(unique=True)
-    nr_telefonu = models.CharField(max_length=9, validators=[telefon_validator], help_text="Podaj numer telefonu składający się tylko z 9 cyfr")
-    organizacja = models.ForeignKey(Organizacja, on_delete=models.SET_NULL, null=True, blank=True, related_name='uzytkownicy')
     rola = models.CharField(max_length=20, choices=ROLE_TYPE)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'email']
-
+    REQUIRED_FIELDS = ['username']
+    
     def __str__(self):
         return f"{self.username} ({self.rola})"
 
@@ -67,6 +66,8 @@ class Oferta(models.Model):
     organizacja = models.ForeignKey(Organizacja, on_delete=models.CASCADE, related_name='oferty')
     projekt = models.ForeignKey(Projekt, on_delete=models.CASCADE, related_name='oferty')
     tytul_oferty = models.CharField(max_length=100)
+    lokalizacja = models.CharField(max_length=100)
+    data_wyslania = models.DateTimeField()
     wolontariusz = models.ForeignKey(Uzytkownik, on_delete=models.SET_NULL, null=True, blank=True, related_name='oferty')
     czy_ukonczone = models.BooleanField(default=False)
 
