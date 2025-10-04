@@ -38,7 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders',
+    'rest_framework',
+    'wolontariat_krakow',
+    'api',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
@@ -121,7 +124,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8080",
 ]
 
-# Temporary 
+# Temporary
 if DEBUG:
     CORS_ALLOW_ALL_ORIGINS = True
 
