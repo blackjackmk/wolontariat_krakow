@@ -1,4 +1,4 @@
-from app.models import Organizacja, Uzytkownik, Projekt, Oferta, Wiadomosc
+from wolontariat_krakow.models import Organizacja, Uzytkownik, Projekt, Oferta, Wiadomosc
 from django.contrib.auth.hashers import make_password
 from django.utils import timezone
 import random
