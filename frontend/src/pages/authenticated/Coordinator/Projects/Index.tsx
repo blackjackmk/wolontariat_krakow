@@ -32,7 +32,15 @@ export default function CoordinatorProjectsPage() {
   }, []);
 
   const ownProjects = useMemo(() => {
-    let list = user?.organizacja ? projects.filter(p => p.organizacja.id === user.organizacja!.id) : projects;
+    // Coordinators should see all projects. Only organizations are scoped to their own org.
+    let list = projects;
+    if (user?.rola === 'organizacja' && user.organizacja) {
+      const rawOrg = (user as any).organizacja;
+      const orgId: number | null = rawOrg
+        ? (typeof rawOrg === 'number' ? (rawOrg as number) : (rawOrg.id as number))
+        : null;
+      list = orgId ? list.filter(p => p.organizacja.id === orgId) : list;
+    }
     if (qSearchProject) {
       const q = qSearchProject.toLowerCase();
       list = list.filter(p => p.nazwa_projektu.toLowerCase().includes(q) || p.opis_projektu.toLowerCase().includes(q));
