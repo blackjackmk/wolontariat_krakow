@@ -15,14 +15,21 @@ class UzytkownikSerializer(serializers.ModelSerializer):
         source='organizacja', queryset=Organizacja.objects.all(), write_only=True, required=False
     )
     organizacja_nazwa = serializers.CharField(source='organizacja.nazwa_organizacji', read_only=True)
+    czy_maloletni = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Uzytkownik
         fields = [
             'id', 'username', 'email', 'first_name', 'last_name',
-            'nr_telefonu', 'organizacja', 'organizacja_id', 'organizacja_nazwa', 'rola'
+            'nr_telefonu', 'wiek', 'organizacja', 'organizacja_id', 'organizacja_nazwa', 'rola', 'czy_maloletni'
         ]
         read_only_fields = ['id', 'username', 'email']
+
+    def get_czy_maloletni(self, obj: Uzytkownik):
+        try:
+            return obj.wiek is not None and int(obj.wiek) < 18
+        except Exception:
+            return False
 
 class ProjektSerializer(serializers.ModelSerializer):
     organizacja_nazwa = serializers.CharField(source='organizacja.nazwa_organizacji', read_only=True)

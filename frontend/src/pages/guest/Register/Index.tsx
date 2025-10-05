@@ -50,7 +50,12 @@ function makeSchema(accountType: RoleType) {
   }
 
   // wolontariusz
-  return z.object(base);
+  return z.object({
+    ...base,
+    wiek: z.coerce.number().int().min(0).max(120).superRefine(
+      fieldConfig({ label: 'Wiek', inputProps: { type: 'number', min: 0, max: 120 } })
+    ),
+  });
 }
 
 export default function Register() {
@@ -58,6 +63,7 @@ export default function Register() {
   const [accountType, setAccountType] = useState<RoleType>('wolontariusz');
   const [organizations, setOrganizations] = useState<Organizacja[]>([]);
   const [selectedOrgId, setSelectedOrgId] = useState<string>("");
+  const [agePreview, setAgePreview] = useState<number | undefined>(undefined);
 
   const provider = useMemo(() => new ZodProvider(makeSchema(accountType)), [accountType]);
 
@@ -104,6 +110,14 @@ export default function Register() {
           <AutoForm
             key={accountType}
             schema={provider}
+            onChange={(values) => {
+              if (accountType === 'wolontariusz') {
+                const w = (values as any).wiek;
+                setAgePreview(typeof w === 'number' ? w : (w ? Number(w) : undefined));
+              } else {
+                setAgePreview(undefined);
+              }
+            }}
             onSubmit={(data) => {
               const payload = { ...data, rola: accountType } as any;
               console.log('register', payload);
@@ -114,15 +128,21 @@ export default function Register() {
                 password: payload.password,
                 nr_telefonu: payload.nr_telefonu,
                 rola: accountType,
+                ...(accountType === 'wolontariusz' && payload.wiek !== undefined ? { wiek: Number(payload.wiek) } : {}),
                 ...(selectedOrgId && (accountType === 'organizacja' || accountType === 'koordynator')
                   ? { organizacja_id: Number(selectedOrgId) }
                   : {}),
               } as {
-                username: string; email: string; password: string; nr_telefonu: string; rola: RoleType; organizacja_id?: number;
+                username: string; email: string; password: string; nr_telefonu: string; rola: RoleType; organizacja_id?: number; wiek?: number;
               };
               register(req);
             }}
           >
+            {accountType === 'wolontariusz' && (
+              <div className="text-sm text-muted-foreground -mt-1 mb-2">
+                Status konta: {typeof agePreview === 'number' ? (agePreview < 18 ? 'Małoletni' : 'Pełnoletni') : '—'}
+              </div>
+            )}
             <SubmitButton>Zarejestruj</SubmitButton>
           </AutoForm>
         </CardContent>

@@ -107,7 +107,12 @@ export default function VolunteerOffersPage() {
       </div>
 
       <main className="md:col-span-9">
-        <h1 className="text-2xl font-semibold mb-4">Oferty dla wolontariuszy</h1>
+        <h1 className="text-2xl font-semibold mb-1">Oferty dla wolontariuszy</h1>
+        {user?.rola === 'wolontariusz' && (
+          <div className={`inline-flex items-center gap-2 mb-4 text-xs px-2 py-1 rounded border ${user?.czy_maloletni ? 'bg-yellow-50 border-yellow-300 text-yellow-700' : 'bg-emerald-50 border-emerald-300 text-emerald-700'}`}>
+            Status konta: {user?.czy_maloletni ? 'Małoletni' : 'Pełnoletni'}{typeof user?.wiek === 'number' ? ` (${user?.wiek} lat)` : ''}
+          </div>
+        )}
         {filtered.length === 0 ? (
           <div className="text-gray-600">Brak ofert dla wybranych filtrów.</div>
         ) : (

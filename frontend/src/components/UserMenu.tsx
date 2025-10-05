@@ -45,6 +45,11 @@ export default function UserMenu({ variant = 'desktop', onLogout }: Props) {
           <div className="min-w-0">
             <div className="font-medium truncate" title={displayName}>{displayName}</div>
             <div className="text-xs text-gray-500 truncate" title={user.email}>{user.email}</div>
+            {user.rola === 'wolontariusz' && (
+              <div className={`inline-flex items-center gap-2 mt-1 text-[11px] px-1.5 py-0.5 rounded border ${user.czy_maloletni ? 'bg-yellow-50 border-yellow-300 text-yellow-700' : 'bg-emerald-50 border-emerald-300 text-emerald-700'}`}>
+                {user.czy_maloletni ? 'Małoletni' : 'Pełnoletni'}{typeof user.wiek === 'number' ? ` (${user.wiek} lat)` : ''}
+              </div>
+            )}
           </div>
         </div>
         <div className="pt-3 space-y-2">
@@ -86,6 +91,11 @@ export default function UserMenu({ variant = 'desktop', onLogout }: Props) {
             <div className="min-w-0">
               <div className="font-medium truncate" title={displayName}>{displayName}</div>
               <div className="text-xs text-gray-500 truncate" title={user.email}>{user.email}</div>
+              {user.rola === 'wolontariusz' && (
+                <div className={`inline-flex items-center gap-2 mt-1 text-[11px] px-1.5 py-0.5 rounded border ${user.czy_maloletni ? 'bg-yellow-50 border-yellow-300 text-yellow-700' : 'bg-emerald-50 border-emerald-300 text-emerald-700'}`}>
+                  {user.czy_maloletni ? 'Małoletni' : 'Pełnoletni'}{typeof user.wiek === 'number' ? ` (${user.wiek} lat)` : ''}
+                </div>
+              )}
             </div>
           </div>
           <div className="pt-3 space-y-2">

@@ -38,6 +38,7 @@ class Uzytkownik(AbstractUser):
     email = models.EmailField(unique=True)
 
     nr_telefonu = models.CharField(max_length=9, validators=[telefon_validator], help_text="Podaj numer telefonu składający się tylko z 9 cyfr")
+    wiek = models.PositiveSmallIntegerField(null=True, blank=True, help_text="Wiek (lata). Używane do rozróżniania małoletnich/pełnoletnich wolontariuszy")
     organizacja = models.ForeignKey(Organizacja, on_delete=models.SET_NULL, null=True, blank=True, related_name='uzytkownicy')
     ROLE_TYPE = [
         ('wolontariusz', 'Wolontariusz'),

@@ -98,6 +98,7 @@ export default function OrganizationProjectsShowPage() {
                   <th className="py-2 pr-4">Użytkownik</th>
                   <th className="py-2 pr-4">E-mail</th>
                   <th className="py-2 pr-4">Telefon</th>
+                  <th className="py-2 pr-4">Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -109,6 +110,11 @@ export default function OrganizationProjectsShowPage() {
                     <td className="py-2 pr-4">{v.username}</td>
                     <td className="py-2 pr-4">{v.email}</td>
                     <td className="py-2 pr-4">{v.nr_telefonu}</td>
+                    <td className="py-2 pr-4">
+                      <span className={`inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded border ${v.czy_maloletni ? 'bg-yellow-50 border-yellow-300 text-yellow-700' : 'bg-emerald-50 border-emerald-300 text-emerald-700'}`}>
+                        {v.czy_maloletni ? 'Małoletni' : 'Pełnoletni'}{typeof v.wiek === 'number' ? ` (${v.wiek} lat)` : ''}
+                      </span>
+                    </td>
                   </tr>
                 ))}
               </tbody>

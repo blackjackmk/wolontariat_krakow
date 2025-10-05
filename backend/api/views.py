@@ -481,6 +481,18 @@ def register(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
+    # Additional validation for volunteers: require wiek
+    rola = request.data.get('rola')
+    if rola == 'wolontariusz':
+        if 'wiek' not in request.data:
+            return Response({'error': 'Missing required field: wiek'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            wiek_val = int(request.data.get('wiek'))
+            if wiek_val < 0 or wiek_val > 120:
+                return Response({'error': 'Wiek musi być liczbą w zakresie 0-120'}, status=status.HTTP_400_BAD_REQUEST)
+        except (TypeError, ValueError):
+            return Response({'error': 'Wiek musi być liczbą całkowitą'}, status=status.HTTP_400_BAD_REQUEST)
+
     try:
         user = Uzytkownik.objects.create_user(
             username=request.data['username'],
@@ -488,6 +500,7 @@ def register(request):
             password=request.data['password'],
             rola=request.data['rola'],
             nr_telefonu=request.data['nr_telefonu'],
+            wiek=request.data.get('wiek', None),
             first_name=request.data.get('first_name', ''),
             last_name=request.data.get('last_name', ''),
         )

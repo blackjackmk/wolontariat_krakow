@@ -3,8 +3,10 @@ import { getMyOffers } from '@/api/offers';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { downloadOfferCertificate } from '@/api/offers';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function VolunteerAppliedOffersPage() {
+  const { user } = useAuth();
   const [offers, setOffers] = useState<Oferta[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -25,6 +27,11 @@ export default function VolunteerAppliedOffersPage() {
   return (
     <section className="space-y-4">
       <h1 className="text-2xl font-semibold">Zgłoszone oferty</h1>
+      {user?.rola === 'wolontariusz' && (
+        <div className={`inline-flex items-center gap-2 -mt-2 text-xs px-2 py-1 rounded border ${user?.czy_maloletni ? 'bg-yellow-50 border-yellow-300 text-yellow-700' : 'bg-emerald-50 border-emerald-300 text-emerald-700'}`}>
+          Status konta: {user?.czy_maloletni ? 'Małoletni' : 'Pełnoletni'}{typeof user?.wiek === 'number' ? ` (${user?.wiek} lat)` : ''}
+        </div>
+      )}
       <Card className="p-4">
         {sorted.length === 0 ? (
           <div className="text-sm text-gray-600">Brak zgłoszonych ofert.</div>

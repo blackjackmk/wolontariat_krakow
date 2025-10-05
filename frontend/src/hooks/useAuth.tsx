@@ -6,7 +6,7 @@ import { loginApi, logoutApi, registerApi } from "@/api/auth";
 interface AuthContextType {
   user: Uzytkownik | null;
   login: (username: string, password: string) => Promise<void>;
-  register: (payload: { username: string; email: string; password: string; nr_telefonu: string; rola: RoleType; first_name?: string; last_name?: string; organizacja_id?: number }) => Promise<void>;
+  register: (payload: { username: string; email: string; password: string; nr_telefonu: string; rola: RoleType; first_name?: string; last_name?: string; organizacja_id?: number; wiek?: number }) => Promise<void>;
   logout: () => void;
 }
 
@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [user]);
 
-  const register = async (payload: { username: string; email: string; password: string; nr_telefonu: string; rola: RoleType; first_name?: string; last_name?: string; organizacja_id?: number }) => {
+  const register = async (payload: { username: string; email: string; password: string; nr_telefonu: string; rola: RoleType; first_name?: string; last_name?: string; organizacja_id?: number; wiek?: number }) => {
     const u = await registerApi(payload);
     setUser(u);
   };

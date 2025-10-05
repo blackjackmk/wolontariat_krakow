@@ -22,6 +22,7 @@ type RegisterPayload = {
   last_name?: string;
   // Note: backend supports organizacja_id optionally, but UI does not collect it yet
   organizacja_id?: number;
+  wiek?: number;
 };
 
 export async function registerApi(payload: RegisterPayload): Promise<Uzytkownik> {

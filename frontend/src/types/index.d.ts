@@ -20,8 +20,10 @@ type Uzytkownik = {
   username: string;
   email: string;
   nr_telefonu: string; // must be exactly 9 digits
+  wiek?: number; // age in years
   organizacja?: Organizacja | null; // ForeignKey (nullable)
   rola: RoleType;
+  czy_maloletni?: boolean; // computed by backend
   // AbstractUser adds:
   first_name?: string;
   last_name?: string;

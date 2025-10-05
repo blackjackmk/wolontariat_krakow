@@ -35,10 +35,12 @@ export function mapOfertaFromApi(o: any): Oferta {
     username: w.username ?? '',
     email: w.email ?? '',
     nr_telefonu: w.nr_telefonu ?? '',
+    wiek: typeof w.wiek === 'number' ? w.wiek : (w.wiek ? Number(w.wiek) : undefined),
     organizacja: w.organizacja
       ? toOrganizacjaMinimal(w.organizacja, w.organizacja_nazwa ?? '')
       : null,
     rola: (w.rola as RoleType) ?? 'wolontariusz',
+    czy_maloletni: typeof w.czy_maloletni === 'boolean' ? w.czy_maloletni : (w.wiek ? Number(w.wiek) < 18 : undefined),
     first_name: w.first_name,
     last_name: w.last_name,
     is_active: w.is_active,
