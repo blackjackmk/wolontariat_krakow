@@ -17,6 +17,15 @@ const offerSchema = z.object({
   lokalizacja: z.string().min(1).superRefine(
     fieldConfig({ label: 'Lokalizacja', inputProps: { placeholder: 'np. Kraków' } })
   ),
+  tematyka: z.string().optional().superRefine(
+    fieldConfig({ label: 'Tematyka', inputProps: { placeholder: 'np. Ekologia' } })
+  ),
+  czas_trwania: z.string().optional().superRefine(
+    fieldConfig({ label: 'Czas trwania', inputProps: { placeholder: 'np. 2-3h tygodniowo' } })
+  ),
+  wymagania: z.string().optional().superRefine(
+    fieldConfig({ label: 'Wymagania', inputProps: { placeholder: 'np. komunikatywność' } })
+  ),
 });
 const provider = new ZodProvider(offerSchema);
 
@@ -64,6 +73,9 @@ export default function OrganizationOffersCreatePage() {
           defaultValues={{
             tytul_oferty: '',
             lokalizacja: '',
+            tematyka: '',
+            czas_trwania: '',
+            wymagania: '',
           }}
           onSubmit={async (data) => {
             try {
@@ -71,6 +83,9 @@ export default function OrganizationOffersCreatePage() {
                 projekt: Number(preselectProject),
                 tytul_oferty: data.tytul_oferty,
                 lokalizacja: data.lokalizacja,
+                tematyka: data.tematyka || undefined,
+                czas_trwania: data.czas_trwania || undefined,
+                wymagania: data.wymagania || undefined,
               });
             } finally {
               navigate(`/organization/projects/${preselectProject}`);

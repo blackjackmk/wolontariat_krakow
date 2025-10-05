@@ -53,19 +53,18 @@ export default function VolunteerOfferShowPage() {
         {offer.czas_trwania && (
           <div className="text-sm text-gray-700">Czas trwania: <b>{offer.czas_trwania}</b></div>
         )}
-        {offer.temat && (
-          <div className="text-sm text-gray-700">Temat: <b>{offer.temat}</b></div>
+        {offer.tematyka && (
+          <div className="text-sm text-gray-700">Tematyka: <b>{offer.tematyka}</b></div>
         )}
         <div className="text-sm text-gray-700">
           Status: {offer.czy_ukonczone ? 'Ukończone' : 'Otwarte'}
         </div>
         <div className="text-sm text-gray-700">
           Uczestnicy: {offer.liczba_uczestnikow ?? (offer.wolontariusz ? 1 : 0)}
-          {offer.limit_uczestnikow ? ` / ${offer.limit_uczestnikow}` : ''}
         </div>
-        {offer.wymagania && offer.wymagania.length > 0 && (
+        {offer.wymagania && (
           <div className="text-sm text-gray-700">
-            Wymagania: {offer.wymagania.join(', ')}
+            Wymagania: {offer.wymagania}
           </div>
         )}
         <div className="pt-2 flex gap-2">

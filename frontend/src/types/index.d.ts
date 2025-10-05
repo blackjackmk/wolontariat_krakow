@@ -55,10 +55,9 @@ type Oferta = {
   // additional placeholder fields for UI/filters
   lokalizacja?: string;
   czas_trwania?: string; // e.g., "2-4h tygodniowo"
-  wymagania?: string[];
-  temat?: string; // topic/category
+  wymagania?: string; // free text from backend
+  tematyka?: string; // topic/category (backend field)
   liczba_uczestnikow?: number;
-  limit_uczestnikow?: number;
 };
 
 // --- Wiadomosc ---

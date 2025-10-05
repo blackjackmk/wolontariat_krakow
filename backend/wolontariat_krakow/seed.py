@@ -80,23 +80,51 @@ print("Dodano 5 projektów")
 
 # --- Oferty ---
 oferty_dane = [
-    ("Pomoc w schronisku"),
-    ("Warsztaty ekologiczne"),
-    ("Zbiórka żywności"),
-    ("Sprzątanie lasu"),
-    ("Pomoc w domu dziecka"),
+    {
+        "tytul": "Pomoc w schronisku",
+        "tematyka": "Opieka nad zwierzętami",
+        "czas_trwania": "4h w weekend",
+        "wymagania": "Empatia, brak alergii na sierść, punktualność.",
+    },
+    {
+        "tytul": "Warsztaty ekologiczne",
+        "tematyka": "Edukacja ekologiczna",
+        "czas_trwania": "1 dzień",
+        "wymagania": "Komunikatywność, podstawowa wiedza ekologiczna.",
+    },
+    {
+        "tytul": "Zbiórka żywności",
+        "tematyka": "Wsparcie społeczne",
+        "czas_trwania": "2-3h",
+        "wymagania": "Uprzejmość, praca w zespole, dokładność.",
+    },
+    {
+        "tytul": "Sprzątanie lasu",
+        "tematyka": "Ekologia",
+        "czas_trwania": "1/2 dnia",
+        "wymagania": "Sprawność fizyczna, wygodne obuwie, chęć do pracy.",
+    },
+    {
+        "tytul": "Pomoc w domu dziecka",
+        "tematyka": "Wsparcie dzieci",
+        "czas_trwania": "3h tygodniowo",
+        "wymagania": "Cierpliwość, zaświadczenie o niekaralności.",
+    },
 ]
 
 oferty = []
-for tytul in oferty_dane:
+for item in oferty_dane:
     losowa_data = timezone.now() - timedelta(days=random.randint(0, 10))
     oferty.append(
         Oferta.objects.create(
             organizacja=random.choice(organizacje),
             projekt=random.choice(projekty),
-            tytul_oferty=tytul,
+            tytul_oferty=item["tytul"],
             lokalizacja="Krakow",
-            data_wyslania=losowa_data
+            data_wyslania=losowa_data,
+            tematyka=item["tematyka"],
+            czas_trwania=item["czas_trwania"],
+            wymagania=item["wymagania"],
         )
     )
 

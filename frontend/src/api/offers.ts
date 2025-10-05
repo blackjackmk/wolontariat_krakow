@@ -56,14 +56,30 @@ export async function assignVolunteer(offerId: number, volunteerId: number): Pro
   }
 }
 
-export async function createOffer(data: { projekt: number; tytul_oferty: string; lokalizacja: string }): Promise<Oferta> {
+export async function createOffer(data: {
+  projekt: number;
+  tytul_oferty: string;
+  lokalizacja: string;
+  tematyka?: string;
+  czas_trwania?: string;
+  wymagania?: string;
+}): Promise<Oferta> {
   const res = await api.post('offers/', data);
   return mapOfertaFromApi(res.data);
 }
 
 export async function updateOffer(
   id: number,
-  data: Partial<{ projekt: number; tytul_oferty: string; lokalizacja: string; wolontariusz: number | null; czy_ukonczone: boolean }>
+  data: Partial<{
+    projekt: number;
+    tytul_oferty: string;
+    lokalizacja: string;
+    tematyka: string;
+    czas_trwania: string;
+    wymagania: string;
+    wolontariusz: number | null;
+    czy_ukonczone: boolean;
+  }>
 ): Promise<Oferta> {
   const res = await api.patch(`offers/${id}/`, data);
   return mapOfertaFromApi(res.data);

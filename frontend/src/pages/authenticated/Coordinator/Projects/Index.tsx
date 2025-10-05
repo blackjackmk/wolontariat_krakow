@@ -128,7 +128,7 @@ export default function CoordinatorProjectsPage() {
                     <div key={o.id} className="rounded border p-2">
                       <div className="text-sm font-medium">{o.tytul_oferty}</div>
                       <div className="text-xs text-gray-600">
-                        Uczestnicy: {o.liczba_uczestnikow ?? (o.wolontariusz ? 1 : 0)}{o.limit_uczestnikow ? ` / ${o.limit_uczestnikow}` : ''}
+                        Uczestnicy: {o.liczba_uczestnikow ?? (o.wolontariusz ? 1 : 0)}
                       </div>
                       <div className="flex gap-2 pt-2 items-center">
                         <Select

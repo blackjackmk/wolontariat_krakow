@@ -44,8 +44,13 @@ export default function OrganizationOffersShowPage() {
         </div>
         <div className="mt-3 flex flex-wrap gap-2 text-xs">
           {offer.lokalizacja && <span className="rounded bg-gray-100 px-2 py-0.5">{offer.lokalizacja}</span>}
+          {offer.tematyka && <span className="rounded bg-blue-100 text-blue-800 px-2 py-0.5">{offer.tematyka}</span>}
+          {offer.czas_trwania && <span className="rounded bg-purple-100 text-purple-800 px-2 py-0.5">{offer.czas_trwania}</span>}
           {offer.czy_ukonczone && <span className="rounded bg-green-100 text-green-800 px-2 py-0.5">Zakończona</span>}
         </div>
+        {offer.wymagania && (
+          <div className="text-sm text-gray-700 mt-2">Wymagania: {offer.wymagania}</div>
+        )}
       </Card>
 
       <Card className="p-4">

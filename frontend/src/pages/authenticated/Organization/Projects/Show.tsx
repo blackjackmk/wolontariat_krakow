@@ -51,7 +51,7 @@ export default function OrganizationProjectsShowPage() {
               <Card key={o.id} className="p-3">
                 <div className="font-medium text-sm">{o.tytul_oferty}</div>
                 <div className="text-xs text-gray-600">
-                  Uczestnicy: {o.liczba_uczestnikow ?? (o.wolontariusz ? 1 : 0)}{o.limit_uczestnikow ? ` / ${o.limit_uczestnikow}` : ''}
+                  Uczestnicy: {o.liczba_uczestnikow ?? (o.wolontariusz ? 1 : 0)}
                 </div>
                 <div className="text-xs text-gray-600">Status: {o.czy_ukonczone ? 'Ukończone' : 'Otwarte'}</div>
                 <Button asChild size="sm" variant="outline" className="mt-2">

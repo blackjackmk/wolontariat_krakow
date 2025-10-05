@@ -27,7 +27,7 @@ export default function VolunteerOffersPage() {
   }, []);
 
   const topics = useMemo(
-    () => Array.from(new Set(offers.map(o => o.temat).filter(Boolean))) as string[],
+    () => Array.from(new Set(offers.map(o => o.tematyka).filter(Boolean))) as string[],
     [offers]
   );
   const durations = useMemo(
@@ -38,12 +38,12 @@ export default function VolunteerOffersPage() {
   if (loading) return <div>Ładowanie ofert…</div>;
 
   const filtered = offers.filter(o => {
-    if (qTopic && (o.temat || '').toLowerCase() !== qTopic.toLowerCase()) return false;
+    if (qTopic && (o.tematyka || '').toLowerCase() !== qTopic.toLowerCase()) return false;
     if (qLocation && !(o.lokalizacja || '').toLowerCase().includes(qLocation.toLowerCase())) return false;
     if (qDuration && (o.czas_trwania || '').toLowerCase() !== qDuration.toLowerCase()) return false;
     if (qOrganizer && !o.organizacja.nazwa_organizacji.toLowerCase().includes(qOrganizer.toLowerCase())) return false;
     if (qRequirements) {
-      const req = (o.wymagania || []).join(' ').toLowerCase();
+      const req = (o.wymagania || '').toLowerCase();
       if (!req.includes(qRequirements.toLowerCase())) return false;
     }
     return true;
@@ -126,11 +126,10 @@ export default function VolunteerOffersPage() {
                   <div className="text-sm flex flex-wrap gap-2">
                     {oferta.lokalizacja && <span className="rounded bg-gray-100 px-2 py-0.5 text-xs">{oferta.lokalizacja}</span>}
                     {oferta.czas_trwania && <span className="rounded bg-gray-100 px-2 py-0.5 text-xs">{oferta.czas_trwania}</span>}
-                    {oferta.temat && <span className="rounded bg-gray-100 px-2 py-0.5 text-xs">{oferta.temat}</span>}
+                    {oferta.tematyka && <span className="rounded bg-gray-100 px-2 py-0.5 text-xs">{oferta.tematyka}</span>}
                   </div>
                   <div className="text-xs text-gray-600">
                     Uczestnicy: {oferta.liczba_uczestnikow ?? (oferta.wolontariusz ? 1 : 0)}
-                    {oferta.limit_uczestnikow ? ` / ${oferta.limit_uczestnikow}` : ''}
                   </div>
                   <div className="flex gap-2 pt-2 mt-auto">
                     <Button
