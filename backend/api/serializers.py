@@ -39,20 +39,34 @@ class OfertaSerializer(serializers.ModelSerializer):
     projekt_nazwa = serializers.CharField(source='projekt.nazwa_projektu', read_only=True)
     organizacja_nazwa = serializers.CharField(source='organizacja.nazwa_organizacji', read_only=True)
     wolontariusz_info = UzytkownikSerializer(source='wolontariusz', read_only=True)
+    wolontariusze = serializers.SerializerMethodField()
+    liczba_uczestnikow = serializers.SerializerMethodField()
 
     class Meta:
         model = Oferta
         fields = [
             'id', 'organizacja', 'organizacja_nazwa', 'projekt', 'projekt_nazwa',
             'tytul_oferty', 'lokalizacja', 'data_wyslania', 'wolontariusz',
-            'wolontariusz_info', 'czy_ukonczone'
+            'wolontariusz_info', 'wolontariusze', 'liczba_uczestnikow', 'czy_ukonczone'
         ]
         read_only_fields = ['organizacja', 'data_wyslania']
+
+    # Helpers for multi-assignment via Zlecenie
+    def get_wolontariusze(self, obj):
+        from wolontariat_krakow.models import Uzytkownik
+        qs = Uzytkownik.objects.filter(zlecenia__oferta=obj).distinct()
+        return UzytkownikSerializer(qs, many=True).data
+
+    def get_liczba_uczestnikow(self, obj):
+        from wolontariat_krakow.models import Uzytkownik
+        return Uzytkownik.objects.filter(zlecenia__oferta=obj).distinct().count()
 
 class OfertaCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Oferta
         fields = ['projekt', 'tytul_oferty', 'lokalizacja', 'data_wyslania']
+
+    pass
 
 class RegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, validators=[validate_password])

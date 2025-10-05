@@ -81,7 +81,7 @@ export default function OrganizationOffersEditPage() {
                 czy_ukonczone: data.czy_ukonczone,
               });
             } finally {
-              navigate('/organization/offers');
+              navigate(`/organization/projects/${projekt.id}`);
             }
           }}
         >

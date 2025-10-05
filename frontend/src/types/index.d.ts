@@ -50,6 +50,7 @@ type Oferta = {
   projekt: Projekt; // Foreign key relation
   tytul_oferty: string;
   wolontariusz?: Uzytkownik | null; // Optional (nullable)
+  wolontariusze?: Uzytkownik[]; // Multi-assignment via Zlecenie
   czy_ukonczone: boolean;
   // additional placeholder fields for UI/filters
   lokalizacja?: string;

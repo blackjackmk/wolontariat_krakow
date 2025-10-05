@@ -133,8 +133,19 @@ export default function VolunteerOffersPage() {
                     {oferta.limit_uczestnikow ? ` / ${oferta.limit_uczestnikow}` : ''}
                   </div>
                   <div className="flex gap-2 pt-2 mt-auto">
-                    <Button size="sm" onClick={() => handleApply(oferta.id)}>
-                      Aplikuj
+                    <Button
+                      size="sm"
+                      onClick={() => handleApply(oferta.id)}
+                      disabled={Boolean(
+                        oferta.czy_ukonczone ||
+                        (user && ((oferta.wolontariusze || []).some(u => u.id === user.id) || (oferta.wolontariusz && oferta.wolontariusz.id === user.id)))
+                      )}
+                    >
+                      {oferta.czy_ukonczone
+                        ? 'Zakończona'
+                        : user && ((oferta.wolontariusze || []).some(u => u.id === user.id) || (oferta.wolontariusz && oferta.wolontariusz.id === user.id))
+                        ? 'Zgłoszono'
+                        : 'Aplikuj'}
                     </Button>
                     {/* Placeholder detail link; route added separately */}
                     <Link

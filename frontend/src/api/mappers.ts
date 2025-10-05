@@ -30,23 +30,29 @@ export function mapOfertaFromApi(o: any): Oferta {
   };
 
   let wolontariusz: Uzytkownik | null = null;
-  if (o.wolontariusz_info) {
+  const normalizeUser = (w: any): Uzytkownik => ({
+    id: w.id,
+    username: w.username ?? '',
+    email: w.email ?? '',
+    nr_telefonu: w.nr_telefonu ?? '',
+    organizacja: w.organizacja
+      ? toOrganizacjaMinimal(w.organizacja, w.organizacja_nazwa ?? '')
+      : null,
+    rola: (w.rola as RoleType) ?? 'wolontariusz',
+    first_name: w.first_name,
+    last_name: w.last_name,
+    is_active: w.is_active,
+    is_staff: w.is_staff,
+    date_joined: w.date_joined,
+  });
+
+  let wolontariusze: Uzytkownik[] | undefined = undefined;
+  if (Array.isArray(o.wolontariusze) && o.wolontariusze.length > 0) {
+    wolontariusze = o.wolontariusze.map((w: any) => normalizeUser(w));
+    wolontariusz = wolontariusze[0];
+  } else if (o.wolontariusz_info) {
     const w = o.wolontariusz_info;
-    wolontariusz = {
-      id: w.id,
-      username: w.username ?? '',
-      email: w.email ?? '',
-      nr_telefonu: w.nr_telefonu ?? '',
-      organizacja: w.organizacja
-        ? toOrganizacjaMinimal(w.organizacja, w.organizacja_nazwa ?? '')
-        : null,
-      rola: (w.rola as RoleType) ?? 'wolontariusz',
-      first_name: w.first_name,
-      last_name: w.last_name,
-      is_active: w.is_active,
-      is_staff: w.is_staff,
-      date_joined: w.date_joined,
-    };
+    wolontariusz = normalizeUser(w);
   }
 
   return {
@@ -57,6 +63,7 @@ export function mapOfertaFromApi(o: any): Oferta {
     lokalizacja: o.lokalizacja,
     czy_ukonczone: Boolean(o.czy_ukonczone),
     wolontariusz,
+    wolontariusze,
+    liczba_uczestnikow: typeof o.liczba_uczestnikow === 'number' ? o.liczba_uczestnikow : (wolontariusz ? 1 : 0),
   };
 }
-

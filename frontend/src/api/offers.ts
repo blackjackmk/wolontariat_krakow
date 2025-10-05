@@ -72,3 +72,9 @@ export async function updateOffer(
 export async function deleteOffer(id: number): Promise<void> {
   await api.delete(`offers/${id}/`);
 }
+
+export async function getMyOffers(): Promise<Oferta[]> {
+  const res = await api.get('offers/my_offers/');
+  const items = Array.isArray(res.data) ? res.data : res.data?.results || [];
+  return items.map(mapOfertaFromApi);
+}

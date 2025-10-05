@@ -17,8 +17,9 @@ export default function VolunteerOfferShowPage() {
 
   if (!offer) return <div>Nie znaleziono oferty</div>;
 
-  const canApply = Boolean(user && !offer.wolontariusz && !offer.czy_ukonczone);
-  const canWithdraw = Boolean(user && offer.wolontariusz && offer.wolontariusz.id === user.id && !offer.czy_ukonczone);
+  const alreadyApplied = Boolean(user && ((offer.wolontariusze || []).some(u => u.id === user.id) || (offer.wolontariusz && offer.wolontariusz.id === user.id)));
+  const canApply = Boolean(user && !alreadyApplied && !offer.czy_ukonczone);
+  const canWithdraw = Boolean(user && alreadyApplied && !offer.czy_ukonczone);
 
   const onApply = async () => {
     if (!user) return;
@@ -68,7 +69,9 @@ export default function VolunteerOfferShowPage() {
           </div>
         )}
         <div className="pt-2 flex gap-2">
-          {canApply && <Button onClick={onApply}>Aplikuj</Button>}
+          <Button onClick={onApply} disabled={!canApply}>
+            {alreadyApplied ? 'Zgłoszono' : 'Aplikuj'}
+          </Button>
           {canWithdraw && <Button variant="secondary" onClick={onWithdraw}>Wycofaj zgłoszenie</Button>}
         </div>
       </Card>

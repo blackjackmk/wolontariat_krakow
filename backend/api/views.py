@@ -73,7 +73,8 @@ class OfertaViewSet(viewsets.ModelViewSet):
 
         tylko_wolne = self.request.query_params.get('tylko_wolne')
         if tylko_wolne and tylko_wolne.lower() == 'true':
-            queryset = queryset.filter(wolontariusz__isnull=True)
+            # Only offers with no assigned volunteers via Zlecenie
+            queryset = queryset.filter(~Q(zlecenia__wolontariusz__isnull=False))
 
         completed = self.request.query_params.get('completed')
         if completed and completed.lower() == 'true':
@@ -114,14 +115,12 @@ class OfertaViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        if offer.wolontariusz:
-            return Response(
-                {'error': 'This offer already has a volunteer'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        offer.wolontariusz = request.user
-        offer.save()
+        # Add user to Zlecenie (create if needed)
+        from wolontariat_krakow.models import Zlecenie
+        zlecenie, _ = Zlecenie.objects.get_or_create(oferta=offer)
+        if zlecenie.wolontariusz.filter(id=request.user.id).exists():
+            return Response({'message': 'Already applied'}, status=status.HTTP_200_OK)
+        zlecenie.wolontariusz.add(request.user)
 
         serializer = OfertaSerializer(offer)
         return Response(serializer.data)
@@ -181,9 +180,9 @@ class OfertaViewSet(viewsets.ModelViewSet):
         except Uzytkownik.DoesNotExist:
             return Response({'error': 'Volunteer not found'}, status=status.HTTP_404_NOT_FOUND)
 
-        offer.wolontariusz = user
-        # assignment does not imply completion; leave czy_ukonczone unchanged
-        offer.save()
+        from wolontariat_krakow.models import Zlecenie
+        zlecenie, _ = Zlecenie.objects.get_or_create(oferta=offer)
+        zlecenie.wolontariusz.add(user)
 
         serializer = OfertaSerializer(offer)
         return Response(serializer.data)
@@ -196,12 +195,14 @@ class OfertaViewSet(viewsets.ModelViewSet):
         if request.user.rola != 'wolontariusz':
             return Response({'error': 'Only volunteers can withdraw'}, status=status.HTTP_403_FORBIDDEN)
 
-        if offer.wolontariusz_id != request.user.id:
+        from wolontariat_krakow.models import Zlecenie
+        qs = offer.zlecenia.filter(wolontariusz=request.user)
+        if not qs.exists():
             return Response({'error': 'You are not assigned to this offer'}, status=status.HTTP_400_BAD_REQUEST)
-
-        offer.wolontariusz = None
+        for z in qs:
+            z.wolontariusz.remove(request.user)
         offer.czy_ukonczone = False
-        offer.save()
+        offer.save(update_fields=['czy_ukonczone'])
 
         serializer = OfertaSerializer(offer)
         return Response(serializer.data)
@@ -210,7 +211,7 @@ class OfertaViewSet(viewsets.ModelViewSet):
     def my_offers(self, request):
         """Get offers related to current user"""
         if request.user.rola == 'wolontariusz':
-            offers = Oferta.objects.filter(wolontariusz=request.user)
+            offers = Oferta.objects.filter(zlecenia__wolontariusz=request.user).distinct()
         elif request.user.rola == 'organizacja' and request.user.organizacja:
             offers = Oferta.objects.filter(organizacja=request.user.organizacja)
         else:

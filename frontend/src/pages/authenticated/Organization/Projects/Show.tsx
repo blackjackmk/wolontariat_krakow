@@ -20,6 +20,7 @@ export default function OrganizationProjectsShowPage() {
   if (!project) return <div>Nie znaleziono projektu</div>;
 
   const relatedOffers = offers.filter(o => o.projekt.id === project.id);
+  const appliedVolunteers = relatedOffers.flatMap(o => (Array.isArray(o.wolontariusze) && o.wolontariusze.length > 0) ? o.wolontariusze.map(v => ({...v, __offer: o})) : (o.wolontariusz ? [{...o.wolontariusz, __offer: o}] : []));
 
   return (
     <div className="space-y-4">
@@ -82,6 +83,38 @@ export default function OrganizationProjectsShowPage() {
             <div>{relatedOffers.filter(o => o.czy_ukonczone).length}</div>
           </div>
         </div>
+      </Card>
+
+      <Card className="p-4">
+        <h2 className="font-semibold mb-2">Zgłoszeni wolontariusze</h2>
+        {appliedVolunteers.length === 0 ? (
+          <div className="text-sm text-gray-600">Brak zgłoszeń w tym projekcie.</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead className="text-left text-xs text-gray-600">
+                <tr>
+                  <th className="py-2 pr-4">Oferta</th>
+                  <th className="py-2 pr-4">Użytkownik</th>
+                  <th className="py-2 pr-4">E-mail</th>
+                  <th className="py-2 pr-4">Telefon</th>
+                </tr>
+              </thead>
+              <tbody>
+                {appliedVolunteers.map((v: any) => (
+                  <tr key={`${v.__offer.id}-${v.id}`} className="border-t">
+                    <td className="py-2 pr-4">
+                      <Link className="text-blue-600 hover:underline" to={`/organization/offers/${v.__offer.id}`}>{v.__offer.tytul_oferty}</Link>
+                    </td>
+                    <td className="py-2 pr-4">{v.username}</td>
+                    <td className="py-2 pr-4">{v.email}</td>
+                    <td className="py-2 pr-4">{v.nr_telefonu}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </Card>
     </div>
   );
