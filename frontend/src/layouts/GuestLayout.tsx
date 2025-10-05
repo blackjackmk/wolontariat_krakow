@@ -15,7 +15,7 @@ export default function GuestLayout() {
       {user ? (
         <Link className="text-gray-700 hover:text-black" to="/dashboard" onClick={() => setOpen(false)}>Panel</Link>
       ) : (
-        <Link className="text-gray-700 hover:text-black" to="/login" onClick={() => setOpen(false)}>Login</Link>
+        <Link className="text-gray-700 hover:text-black" to="/login" onClick={() => setOpen(false)}>Zaloguj</Link>
       )}
     </>
   );

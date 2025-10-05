@@ -35,7 +35,13 @@ export default function OrganizationProjectsPage() {
   }, [offers]);
 
   const ownProjects = useMemo(() => {
-    let list = user?.organizacja ? projects.filter(p => p.organizacja.id === user.organizacja!.id) : projects;
+    // Handle both API shapes where user.organizacja can be an ID (number)
+    // or an embedded object with an id field.
+    const rawOrg = (user as any)?.organizacja;
+    const orgId: number | null = rawOrg
+      ? (typeof rawOrg === 'number' ? rawOrg as number : (rawOrg.id as number))
+      : null;
+    let list = orgId ? projects.filter(p => p.organizacja.id === orgId) : projects;
     if (qSearch) {
       const q = qSearch.toLowerCase();
       list = list.filter(p => p.nazwa_projektu.toLowerCase().includes(q) || p.opis_projektu.toLowerCase().includes(q));

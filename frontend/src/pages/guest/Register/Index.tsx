@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AutoForm } from "@/components/ui/autoform";
 import { SubmitButton } from "@/components/ui/autoform/components/SubmitButton";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -7,6 +7,7 @@ import { ZodProvider, fieldConfig } from "@autoform/zod";
 import z from "zod";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { getOrganizations } from "@/api/organizations";
 
 function makeSchema(accountType: RoleType) {
   const base = {
@@ -55,8 +56,15 @@ function makeSchema(accountType: RoleType) {
 export default function Register() {
   const { register } = useAuth();
   const [accountType, setAccountType] = useState<RoleType>('wolontariusz');
+  const [organizations, setOrganizations] = useState<Organizacja[]>([]);
+  const [selectedOrgId, setSelectedOrgId] = useState<string>("");
 
   const provider = useMemo(() => new ZodProvider(makeSchema(accountType)), [accountType]);
+
+  useEffect(() => {
+    // Load organizations for selection (public endpoint)
+    getOrganizations().then(setOrganizations).catch(() => setOrganizations([]));
+  }, []);
 
   return (
     <div>
@@ -77,6 +85,22 @@ export default function Register() {
             </Select>
           </div>
 
+          {(accountType === 'organizacja' || accountType === 'koordynator') && (
+            <div className="space-y-2 mb-4">
+              <Label>Przypisz do organizacji</Label>
+              <Select value={selectedOrgId} onValueChange={(v) => setSelectedOrgId(v)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Wybierz organizację" />
+                </SelectTrigger>
+                <SelectContent>
+                  {organizations.map((o) => (
+                    <SelectItem key={o.id} value={String(o.id)}>{o.nazwa_organizacji}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
           <AutoForm
             key={accountType}
             schema={provider}
@@ -90,6 +114,11 @@ export default function Register() {
                 password: payload.password,
                 nr_telefonu: payload.nr_telefonu,
                 rola: accountType,
+                ...(selectedOrgId && (accountType === 'organizacja' || accountType === 'koordynator')
+                  ? { organizacja_id: Number(selectedOrgId) }
+                  : {}),
+              } as {
+                username: string; email: string; password: string; nr_telefonu: string; rola: RoleType; organizacja_id?: number;
               };
               register(req);
             }}

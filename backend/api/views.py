@@ -153,6 +153,57 @@ class OfertaViewSet(viewsets.ModelViewSet):
         serializer = OfertaSerializer(offer)
         return Response(serializer.data)
 
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def assign(self, request, pk=None):
+        """Assign a volunteer to an offer (organization/coordinator only)"""
+        offer = self.get_object()
+
+        if request.user.rola not in ['organizacja', 'koordynator']:
+            return Response(
+                {'error': 'Only organizations and coordinators can assign volunteers'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        if request.user.rola == 'organizacja' and offer.organizacja != request.user.organizacja:
+            return Response(
+                {'error': 'You can only assign volunteers for your organization offers'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        wolontariusz_id = request.data.get('wolontariusz_id')
+        if not wolontariusz_id:
+            return Response({'error': 'wolontariusz_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = Uzytkownik.objects.get(id=wolontariusz_id, rola='wolontariusz')
+        except Uzytkownik.DoesNotExist:
+            return Response({'error': 'Volunteer not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        offer.wolontariusz = user
+        # assignment does not imply completion; leave czy_ukonczone unchanged
+        offer.save()
+
+        serializer = OfertaSerializer(offer)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def withdraw(self, request, pk=None):
+        """Withdraw application from an offer (volunteer only)"""
+        offer = self.get_object()
+
+        if request.user.rola != 'wolontariusz':
+            return Response({'error': 'Only volunteers can withdraw'}, status=status.HTTP_403_FORBIDDEN)
+
+        if offer.wolontariusz_id != request.user.id:
+            return Response({'error': 'You are not assigned to this offer'}, status=status.HTTP_400_BAD_REQUEST)
+
+        offer.wolontariusz = None
+        offer.czy_ukonczone = False
+        offer.save()
+
+        serializer = OfertaSerializer(offer)
+        return Response(serializer.data)
+
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def my_offers(self, request):
         """Get offers related to current user"""
@@ -245,7 +296,8 @@ def register(request):
             last_name=request.data.get('last_name', ''),
         )
 
-        if request.data['rola'] == 'organizacja' and 'organizacja_id' in request.data:
+        # Optionally attach organization for organization/coordinator accounts
+        if 'organizacja_id' in request.data and request.data['rola'] in ['organizacja', 'koordynator']:
             user.organizacja_id = request.data['organizacja_id']
             user.save()
 

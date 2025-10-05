@@ -8,13 +8,19 @@ class OrganizacjaSerializer(serializers.ModelSerializer):
         fields = ['id', 'nazwa_organizacji', 'nr_telefonu', 'nip', 'weryfikacja']
 
 class UzytkownikSerializer(serializers.ModelSerializer):
+    # Return nested organization object for reads
+    organizacja = OrganizacjaSerializer(read_only=True)
+    # Allow setting by ID where applicable (write-only alias)
+    organizacja_id = serializers.PrimaryKeyRelatedField(
+        source='organizacja', queryset=Organizacja.objects.all(), write_only=True, required=False
+    )
     organizacja_nazwa = serializers.CharField(source='organizacja.nazwa_organizacji', read_only=True)
 
     class Meta:
         model = Uzytkownik
         fields = [
             'id', 'username', 'email', 'first_name', 'last_name',
-            'nr_telefonu', 'organizacja', 'organizacja_nazwa', 'rola'
+            'nr_telefonu', 'organizacja', 'organizacja_id', 'organizacja_nazwa', 'rola'
         ]
         read_only_fields = ['id', 'username', 'email']
 

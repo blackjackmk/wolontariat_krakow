@@ -27,7 +27,7 @@ export default function OrganizationOffersShowPage() {
           <Link to={`/organization/offers/${offer.id}/edit`}><Pencil /> Edytuj</Link>
         </Button>
         <Button asChild variant="outline">
-          <Link to={`/organization/offers`}><ArrowLeft /> Wróć</Link>
+          <Link to={`/organization/projects/${offer.projekt.id}`}><ArrowLeft /> Wróć</Link>
         </Button>
       </div>
     </div>

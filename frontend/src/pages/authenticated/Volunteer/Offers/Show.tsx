@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getOfferById, applyToOffer } from '@/api/offers';
+import { getOfferById, applyToOffer, withdrawApplication } from '@/api/offers';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -17,11 +17,18 @@ export default function VolunteerOfferShowPage() {
 
   if (!offer) return <div>Nie znaleziono oferty</div>;
 
-  const canApply = true; // placeholder rule
+  const canApply = Boolean(user && !offer.wolontariusz && !offer.czy_ukonczone);
+  const canWithdraw = Boolean(user && offer.wolontariusz && offer.wolontariusz.id === user.id && !offer.czy_ukonczone);
 
   const onApply = async () => {
     if (!user) return;
     const updated = await applyToOffer(offer.id, user);
+    if (updated) setOffer({ ...offer, ...updated });
+  };
+
+  const onWithdraw = async () => {
+    if (!user) return;
+    const updated = await withdrawApplication(offer.id, user);
     if (updated) setOffer({ ...offer, ...updated });
   };
 
@@ -60,10 +67,9 @@ export default function VolunteerOfferShowPage() {
             Wymagania: {offer.wymagania.join(', ')}
           </div>
         )}
-        <div className="pt-2">
-          {canApply && (
-            <Button onClick={onApply}>Aplikuj</Button>
-          )}
+        <div className="pt-2 flex gap-2">
+          {canApply && <Button onClick={onApply}>Aplikuj</Button>}
+          {canWithdraw && <Button variant="secondary" onClick={onWithdraw}>Wycofaj zgłoszenie</Button>}
         </div>
       </Card>
 
@@ -93,4 +99,3 @@ export default function VolunteerOfferShowPage() {
     </section>
   );
 }
-

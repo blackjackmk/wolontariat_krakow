@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Pencil, ArrowLeft, Eye } from 'lucide-react';
+import { Pencil, ArrowLeft, Eye, Plus } from 'lucide-react';
 import { getProjects } from '@/api/projects';
 import { getOffers } from '@/api/offers';
 import { Card } from '@/components/ui/card';
@@ -30,6 +30,9 @@ export default function OrganizationProjectsShowPage() {
         <div className="mt-4 flex gap-2">
           <Button asChild>
             <Link to={`/organization/projects/${project.id}/edit`}><Pencil /> Edytuj</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link to={`/organization/offers/create?project=${project.id}`}><Plus /> Dodaj ofertę</Link>
           </Button>
           <Button asChild variant="outline">
             <Link to={`/organization/projects`}><ArrowLeft /> Wróć</Link>

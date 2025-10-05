@@ -28,7 +28,8 @@ export default function OrganizationProjectsCreatePage() {
   }, []);
 
 
-  if (!user?.organizacja) return <div>Brak uprawnień</div>;
+  if (user?.rola !== 'organizacja') return <div>Brak uprawnień</div>;
+  if (!user?.organizacja) return <div>Brak przypisanej organizacji do konta. Skontaktuj się z administratorem.</div>;
 
   return (
     <Card>
@@ -38,7 +39,12 @@ export default function OrganizationProjectsCreatePage() {
           schema={provider}
           onSubmit={async (data) => {
             try {
-              await createProject({ nazwa_projektu: data.nazwa_projektu, opis_projektu: data.opis_projektu });
+              console.log(user);
+              await createProject({ 
+                nazwa_projektu: data.nazwa_projektu, 
+                opis_projektu: data.opis_projektu,
+                organizacja: user.organizacja?.id,
+              });
             } finally {
               navigate('/organization/projects');
             }

@@ -12,7 +12,7 @@ export async function getProjectById(id: number): Promise<Projekt | undefined> {
   return mapProjektFromApi(res.data);
 }
 
-export async function createProject(data: { nazwa_projektu: string; opis_projektu: string }): Promise<Projekt> {
+export async function createProject(data: { nazwa_projektu: string; opis_projektu: string; organizacja?: number }): Promise<Projekt> {
   const res = await api.post('projects/', data);
   return mapProjektFromApi(res.data);
 }

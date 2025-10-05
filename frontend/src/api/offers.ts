@@ -28,21 +28,32 @@ export async function applyToOffer(offerId: number, user: Uzytkownik): Promise<O
 }
 
 export async function withdrawApplication(offerId: number, user: Uzytkownik): Promise<Oferta | undefined> {
-  // Backend doesn’t expose withdraw yet; return optimistic local change
-  const fresh = await getOfferById(offerId);
-  if (!fresh) return undefined;
-  if (fresh.wolontariusz && fresh.wolontariusz.id === user.id) {
-    fresh.wolontariusz = null;
+  try {
+    const res = await api.post(`offers/${offerId}/withdraw/`);
+    return mapOfertaFromApi(res.data);
+  } catch {
+    // Optimistic fallback
+    const fresh = await getOfferById(offerId);
+    if (!fresh) return undefined;
+    if (fresh.wolontariusz && fresh.wolontariusz.id === user.id) {
+      fresh.wolontariusz = null;
+      fresh.czy_ukonczone = false;
+    }
+    return fresh;
   }
-  return fresh;
 }
 
 export async function assignVolunteer(offerId: number, volunteerId: number): Promise<Oferta | undefined> {
-  // Pending backend endpoint; optimistic local change
-  const fresh = await getOfferById(offerId);
-  if (!fresh) return undefined;
-  fresh.wolontariusz = { id: volunteerId, username: '', email: '', nr_telefonu: '', organizacja: null, rola: 'wolontariusz' } as Uzytkownik;
-  return fresh;
+  try {
+    const res = await api.post(`offers/${offerId}/assign/`, { wolontariusz_id: volunteerId });
+    return mapOfertaFromApi(res.data);
+  } catch {
+    // Optimistic fallback
+    const fresh = await getOfferById(offerId);
+    if (!fresh) return undefined;
+    fresh.wolontariusz = { id: volunteerId, username: '', email: '', nr_telefonu: '', organizacja: null, rola: 'wolontariusz' } as Uzytkownik;
+    return fresh;
+  }
 }
 
 export async function createOffer(data: { projekt: number; tytul_oferty: string; lokalizacja: string }): Promise<Oferta> {
