@@ -2,6 +2,9 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 from django.utils import timezone
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+from io import BytesIO
 
 
 # ---Organizacja---
@@ -33,13 +36,8 @@ class Uzytkownik(AbstractUser):
 
     email = models.EmailField(unique=True)
 
-    nr_telefonu = models.CharField(
-        max_length=9, validators=[telefon_validator],
-        help_text="Podaj numer telefonu składający się tylko z 9 cyfr"
-    )
-    organizacja = models.ForeignKey(
-        Organizacja, on_delete=models.SET_NULL, null=True, blank=True, related_name='uzytkownicy'
-    )
+    nr_telefonu = models.CharField(max_length=9, validators=[telefon_validator], help_text="Podaj numer telefonu składający się tylko z 9 cyfr")
+    organizacja = models.ForeignKey(Organizacja, on_delete=models.SET_NULL, null=True, blank=True, related_name='uzytkownicy')
     ROLE_TYPE = [
         ('wolontariusz', 'Wolontariusz'),
         ('koordynator', 'Koordynator'),
@@ -51,6 +49,34 @@ class Uzytkownik(AbstractUser):
     REQUIRED_FIELDS = ['username']
     def __str__(self):
         return f"{self.username} ({self.rola})"
+
+    def certyfikat_gen(self):
+        completed_orders = self.zlecenia.filter(czy_ukonczone=True)
+
+        buffer = BytesIO()
+        pdf = canvas.Canvas(buffer, pagesize=A4)
+        width, height = A4
+
+        pdf.setFont("Calibri-Bold", 20)
+        pdf.drawCentredString(width / 2, height - 100, "Zaświadczenie ukończenia zleceń")
+
+        pdf.setFont("Calibri", 14)
+        pdf.drawString(100, height - 150, f"Wolontariusz: {self.username}")
+        pdf.drawString(100, height - 170, f"E-mail: {self.email}")
+
+        pdf.drawString(100, height - 200, "Ukończone zlecenia:")
+        y = height - 220
+        for zlecenie in completed_orders:
+            pdf.drawString(120, y, f"- {zlecenie.oferta.tytul_oferty} ({zlecenie.oferta.projekt.nazwa_projektu})")
+            y -= 20
+            if y < 50:
+                pdf.showPage()
+                y = height - 50
+
+        pdf.showPage()
+        pdf.save()
+        buffer.seek(0)
+        return ContentFile(buffer.read(), name=f"zaswiadczenie_{self.username}.pdf")
 
 
 # ---Projekt---
@@ -98,6 +124,8 @@ class Wiadomosc(models.Model):
     def __str__(self):
         return f"Wiadomość od {self.nadawca} do {self.odbiorca}"
 
+
+# ---Recenzja---
 class Recenzja(models.Model):
     organizacja = models.ForeignKey('Organizacja', on_delete=models.CASCADE, related_name='recenzje')
     wolontariusz = models.ForeignKey('Uzytkownik', on_delete=models.CASCADE, related_name='recenzje')
