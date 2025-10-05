@@ -1,8 +1,17 @@
 import api from './axios';
 import { mapOfertaFromApi } from './mappers';
 
-export async function getOffers(): Promise<Oferta[]> {
-  const res = await api.get('offers/', { params: { completed: false } });
+export async function getOffers(opts?: { completed?: boolean }): Promise<Oferta[]> {
+  const params: Record<string, any> = {};
+  const completed = opts?.completed ?? false;
+  params.completed = completed;
+  const res = await api.get('offers/', { params });
+  const items = Array.isArray(res.data) ? res.data : res.data?.results || [];
+  return items.map(mapOfertaFromApi);
+}
+
+export async function getAllOffers(): Promise<Oferta[]> {
+  const res = await api.get('offers/');
   const items = Array.isArray(res.data) ? res.data : res.data?.results || [];
   return items.map(mapOfertaFromApi);
 }

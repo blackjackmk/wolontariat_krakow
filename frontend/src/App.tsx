@@ -23,6 +23,7 @@ import OrganizationOffersCreatePage from './pages/authenticated/Organization/Off
 import OrganizationOffersEditPage from './pages/authenticated/Organization/Offers/Edit';
 import OrganizationOffersShowPage from './pages/authenticated/Organization/Offers/Show';
 import VolunteerOfferShowPage from './pages/authenticated/Volunteer/Offers/Show';
+import OrganizationVolunteerShowPage from './pages/authenticated/Organization/Volunteers/Show';
 
 export default function App() {
 
@@ -135,6 +136,14 @@ export default function App() {
               element={
                 <RoleRoute allow={["organizacja"]}>
                   <OrganizationOffersShowPage />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="/organization/volunteers/:id"
+              element={
+                <RoleRoute allow={["organizacja", "koordynator"]}>
+                  <OrganizationVolunteerShowPage />
                 </RoleRoute>
               }
             />

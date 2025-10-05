@@ -110,10 +110,11 @@ class RecenzjaSerializer(serializers.ModelSerializer):
 
 class RecenzjaCreateSerializer(serializers.ModelSerializer):
     oferta = serializers.PrimaryKeyRelatedField(queryset=Oferta.objects.all(), required=False, allow_null=True)
+    wolontariusz = serializers.PrimaryKeyRelatedField(queryset=Uzytkownik.objects.all(), required=False, allow_null=True, write_only=True)
 
     class Meta:
         model = Recenzja
-        fields = ['oferta', 'ocena', 'komentarz']
+        fields = ['oferta', 'ocena', 'komentarz', 'wolontariusz']
 
     def validate_ocena(self, value):
         if not (1 <= value <= 5):
@@ -135,14 +136,30 @@ class RecenzjaCreateSerializer(serializers.ModelSerializer):
             # check that offer is completed/approved
             if not oferta.czy_ukonczone:
                 raise serializers.ValidationError("Można ocenić wolontariusza tylko po zakończeniu oferty.")
-            # check that the volunteer is set on the offer
-            if not oferta.wolontariusz:
-                raise serializers.ValidationError("Nie ma przypisanego wolontariusza do tej oferty.")
+            # Resolve volunteer: prefer explicit, then oferta.wolontariusz, else single Zlecenie participant
+            explicit_vol = data.get('wolontariusz')
+            if explicit_vol is not None:
+                from wolontariat_krakow.models import Uzytkownik as UZ
+                # ensure explicit_vol participates in this oferta via Zlecenie or is oferta.wolontariusz
+                participates = UZ.objects.filter(id=explicit_vol.id, zlecenia__oferta=oferta).exists() or (oferta.wolontariusz_id == explicit_vol.id)
+                if not participates:
+                    raise serializers.ValidationError("Podany wolontariusz nie jest uczestnikiem tej oferty.")
+                data['wolontariusz'] = explicit_vol
+            else:
+                if oferta.wolontariusz:
+                    data['wolontariusz'] = oferta.wolontariusz
+                else:
+                    from wolontariat_krakow.models import Uzytkownik as UZ
+                    participants = list(UZ.objects.filter(zlecenia__oferta=oferta).distinct())
+                    if len(participants) == 1:
+                        data['wolontariusz'] = participants[0]
+                    elif len(participants) == 0:
+                        raise serializers.ValidationError("Brak uczestników dla tej oferty.")
+                    else:
+                        raise serializers.ValidationError("Wskaż wolontariusza, którego oceniasz (pole 'wolontariusz').")
             # prevent duplicate review for same oferta by same organization (if desired)
             if Recenzja.objects.filter(oferta=oferta, organizacja=user.organizacja).exists():
                 raise serializers.ValidationError("Recenzja dla tej oferty już istnieje.")
-            # set the wolontariusz field from oferta
-            data['wolontariusz'] = oferta.wolontariusz
         else:
             # if no oferta provided, require wolontariusz id in context or explicit param?
             # For safety, enforce oferta must be provided

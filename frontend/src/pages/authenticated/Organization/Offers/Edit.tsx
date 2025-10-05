@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getProjects } from '@/api/projects';
 import { getUsers } from '@/api/users';
-import { getOffers, updateOffer } from '@/api/offers';
+import { getOfferById, updateOffer } from '@/api/offers';
 import { AutoForm } from '@/components/ui/autoform';
 import { SubmitButton } from '@/components/ui/autoform/components/SubmitButton';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -40,8 +40,8 @@ export default function OrganizationOffersEditPage() {
   const [offer, setOffer] = useState<Oferta | null>(null);
 
   useEffect(() => {
-    getOffers().then((o) => {
-      setOffer(o.find(x => x.id === id) || null);
+    getOfferById(id).then((o) => {
+      setOffer(o || null);
     });
   }, [id]);
 

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Pencil, ArrowLeft } from 'lucide-react';
-import { getOffers } from '@/api/offers';
+import { getOfferById } from '@/api/offers';
 import { Card } from '@/components/ui/card';
 
 export default function OrganizationOffersShowPage() {
@@ -11,7 +11,7 @@ export default function OrganizationOffersShowPage() {
   const [offer, setOffer] = useState<Oferta | null>(null);
 
   useEffect(() => {
-    getOffers().then(all => setOffer(all.find(o => o.id === id) || null));
+    getOfferById(id).then(o => setOffer(o || null));
   }, [id]);
 
   const volunteers = useMemo(() => {
@@ -66,12 +66,17 @@ export default function OrganizationOffersShowPage() {
                   <th className="py-2 pr-4">E-mail</th>
                   <th className="py-2 pr-4">Telefon</th>
                   <th className="py-2 pr-4">Status</th>
+                  <th className="py-2 pr-4">Akcje</th>
                 </tr>
               </thead>
               <tbody>
-                {volunteers.map(v => (
+                {volunteers.map(v => {
+                  const canReview = Boolean(offer.czy_ukonczone && offer.wolontariusz && offer.wolontariusz.id === v.id);
+                  return (
                   <tr key={v.id} className="border-t">
-                    <td className="py-2 pr-4">{v.username}</td>
+                    <td className="py-2 pr-4">
+                      <Link className="text-blue-600 hover:underline" to={`/organization/volunteers/${v.id}`}>{v.username}</Link>
+                    </td>
                     <td className="py-2 pr-4">{v.email}</td>
                     <td className="py-2 pr-4">{v.nr_telefonu}</td>
                     <td className="py-2 pr-4">
@@ -79,8 +84,36 @@ export default function OrganizationOffersShowPage() {
                         {v.czy_maloletni ? 'Małoletni' : 'Pełnoletni'}{typeof v.wiek === 'number' ? ` (${v.wiek} lat)` : ''}
                       </span>
                     </td>
+                    <td className="py-2 pr-4">
+                      {canReview ? (
+                        <button
+                          className="text-blue-600 hover:underline"
+                          onClick={async () => {
+                            const ratingStr = window.prompt('Ocena (1-5):');
+                            if (!ratingStr) return;
+                            const ocena = Number(ratingStr);
+                            if (!Number.isInteger(ocena) || ocena < 1 || ocena > 5) {
+                              window.alert('Podaj liczbę od 1 do 5');
+                              return;
+                            }
+                            const komentarz = window.prompt('Komentarz (opcjonalny):') || '';
+                            try {
+                              const { createReview } = await import('@/api/reviews');
+                              await createReview({ oferta: offer.id, ocena, komentarz, wolontariusz: v.id });
+                              window.alert('Dziękujemy! Recenzja została dodana.');
+                            } catch (e) {
+                              window.alert('Nie udało się dodać recenzji.');
+                            }
+                          }}
+                        >
+                          Oceń
+                        </button>
+                      ) : (
+                        <span className="text-xs text-gray-400">Brak</span>
+                      )}
+                    </td>
                   </tr>
-                ))}
+                );})}
               </tbody>
             </table>
           </div>

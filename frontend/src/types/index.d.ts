@@ -70,3 +70,14 @@ type Wiadomosc = {
   tresc: string;
   data_wyslania: string; // ISO datetime string (auto_now_add)
 };
+
+// --- Recenzja ---
+type Recenzja = {
+  id: number;
+  organizacja: string; // StringRelatedField
+  wolontariusz: string; // StringRelatedField or name
+  oferta: number | null; // oferta id (nullable)
+  ocena: number; // 1..5
+  komentarz?: string;
+  created_at: string; // ISO datetime
+};
