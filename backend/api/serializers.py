@@ -54,6 +54,7 @@ class OfertaSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'organizacja', 'organizacja_nazwa', 'projekt', 'projekt_nazwa',
             'tytul_oferty', 'lokalizacja', 'tematyka', 'czas_trwania', 'wymagania',  # Added new fields
+            'data',
             'data_wyslania', 'wolontariusz', 'wolontariusz_info', 
             'wolontariusze', 'liczba_uczestnikow', 'czy_ukonczone'
         ]
@@ -75,7 +76,7 @@ class OfertaCreateSerializer(serializers.ModelSerializer):
         model = Oferta
         fields = [
             'projekt', 'tytul_oferty', 'lokalizacja', 
-            'tematyka', 'czas_trwania', 'wymagania',  # Added new fields
+            'tematyka', 'czas_trwania', 'wymagania', 'data',  # Added new fields
             'data_wyslania'
         ]
     pass

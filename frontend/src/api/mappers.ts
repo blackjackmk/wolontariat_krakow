@@ -62,6 +62,7 @@ export function mapOfertaFromApi(o: any): Oferta {
     organizacja,
     projekt,
     tytul_oferty: o.tytul_oferty,
+    data: o.data || undefined,
     lokalizacja: o.lokalizacja,
     tematyka: o.tematyka,
     czas_trwania: o.czas_trwania,

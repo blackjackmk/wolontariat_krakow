@@ -17,6 +17,9 @@ const offerSchema = z.object({
   lokalizacja: z.string().min(1).superRefine(
     fieldConfig({ label: 'Lokalizacja', inputProps: { placeholder: 'np. Kraków' } })
   ),
+  data: z.string().optional().superRefine(
+    fieldConfig({ label: 'Data', inputProps: { placeholder: 'RRRR-MM-DD', type: 'date' } })
+  ),
   tematyka: z.string().optional().superRefine(
     fieldConfig({ label: 'Tematyka', inputProps: { placeholder: 'np. Ekologia' } })
   ),
@@ -57,6 +60,7 @@ export default function OrganizationOffersEditPage() {
           defaultValues={{
             tytul_oferty: offer.tytul_oferty,
             lokalizacja: offer.lokalizacja ?? '',
+            data: offer.data ?? '',
             tematyka: offer.tematyka ?? '',
             czas_trwania: offer.czas_trwania ?? '',
             wymagania: offer.wymagania ?? '',
@@ -67,6 +71,7 @@ export default function OrganizationOffersEditPage() {
               await updateOffer(id, {
                 tytul_oferty: data.tytul_oferty,
                 lokalizacja: data.lokalizacja,
+                data: data.data || '',
                 tematyka: data.tematyka || '',
                 czas_trwania: data.czas_trwania || '',
                 wymagania: data.wymagania || '',

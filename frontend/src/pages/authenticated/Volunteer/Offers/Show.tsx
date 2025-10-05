@@ -41,6 +41,11 @@ export default function VolunteerOfferShowPage() {
       </div>
 
       <Card className="p-4 space-y-2">
+        {offer.data && (
+          <div className="text-sm text-gray-700">
+            Data: <b>{new Date(offer.data + 'T00:00:00').toLocaleDateString('pl-PL', { year: 'numeric', month: 'long', day: 'numeric' })}</b>
+          </div>
+        )}
         <div className="text-sm text-gray-700">
           Organizacja: <b>{offer.organizacja.nazwa_organizacji}</b>
         </div>
@@ -90,7 +95,7 @@ export default function VolunteerOfferShowPage() {
           </div>
           <div className="rounded bg-gray-50 p-3">
             <div className="text-xs text-gray-500">Najbliższa data</div>
-            <div>— (placeholder)</div>
+            <div>{offer.data ? new Date(offer.data + 'T00:00:00').toLocaleDateString('pl-PL', { year: 'numeric', month: 'long', day: 'numeric' }) : '—'}</div>
           </div>
           <div className="rounded bg-gray-50 p-3">
             <div className="text-xs text-gray-500">Kontakt</div>

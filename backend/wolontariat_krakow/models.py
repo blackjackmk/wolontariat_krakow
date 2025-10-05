@@ -98,6 +98,8 @@ class Oferta(models.Model):
     projekt = models.ForeignKey(Projekt, on_delete=models.CASCADE, related_name='oferty')
     tytul_oferty = models.CharField(max_length=100)
     lokalizacja = models.CharField(max_length=100)
+    # Dodatkowe pole: data (tylko data, bez czasu)
+    data = models.DateField(null=True, blank=True, help_text="Data (RRRR-MM-DD)")
     data_wyslania = models.DateTimeField(default=timezone.now)
     wolontariusz = models.ForeignKey(Uzytkownik, on_delete=models.SET_NULL, null=True, blank=True, related_name='oferty')
     czy_ukonczone = models.BooleanField(default=False)

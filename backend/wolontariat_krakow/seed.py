@@ -121,6 +121,7 @@ for item in oferty_dane:
             projekt=random.choice(projekty),
             tytul_oferty=item["tytul"],
             lokalizacja="Krakow",
+            data=losowa_data.date(),
             data_wyslania=losowa_data,
             tematyka=item["tematyka"],
             czas_trwania=item["czas_trwania"],

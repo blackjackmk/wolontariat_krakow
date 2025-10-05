@@ -50,6 +50,9 @@ export default function OrganizationProjectsShowPage() {
             {relatedOffers.map(o => (
               <Card key={o.id} className="p-3">
                 <div className="font-medium text-sm">{o.tytul_oferty}</div>
+                {o.data && (
+                  <div className="text-xs text-gray-600">Data: {new Date(o.data + 'T00:00:00').toLocaleDateString('pl-PL', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                )}
                 <div className="text-xs text-gray-600">
                   Uczestnicy: {o.liczba_uczestnikow ?? (o.wolontariusz ? 1 : 0)}
                 </div>

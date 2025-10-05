@@ -69,6 +69,7 @@ export async function createOffer(data: {
   projekt: number;
   tytul_oferty: string;
   lokalizacja: string;
+  data?: string; // RRRR-MM-DD
   tematyka?: string;
   czas_trwania?: string;
   wymagania?: string;
@@ -83,6 +84,7 @@ export async function updateOffer(
     projekt: number;
     tytul_oferty: string;
     lokalizacja: string;
+    data: string; // RRRR-MM-DD
     tematyka: string;
     czas_trwania: string;
     wymagania: string;

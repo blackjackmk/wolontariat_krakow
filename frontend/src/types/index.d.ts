@@ -51,6 +51,7 @@ type Oferta = {
   organizacja: Organizacja; // Foreign key relation
   projekt: Projekt; // Foreign key relation
   tytul_oferty: string;
+  data?: string; // RRRR-MM-DD (Date only)
   wolontariusz?: Uzytkownik | null; // Optional (nullable)
   wolontariusze?: Uzytkownik[]; // Multi-assignment via Zlecenie
   czy_ukonczone: boolean;

@@ -17,6 +17,9 @@ const offerSchema = z.object({
   lokalizacja: z.string().min(1).superRefine(
     fieldConfig({ label: 'Lokalizacja', inputProps: { placeholder: 'np. Kraków' } })
   ),
+  data: z.string().optional().superRefine(
+    fieldConfig({ label: 'Data', inputProps: { placeholder: 'RRRR-MM-DD', type: 'date' } })
+  ),
   tematyka: z.string().optional().superRefine(
     fieldConfig({ label: 'Tematyka', inputProps: { placeholder: 'np. Ekologia' } })
   ),
@@ -73,6 +76,7 @@ export default function OrganizationOffersCreatePage() {
           defaultValues={{
             tytul_oferty: '',
             lokalizacja: '',
+            data: '',
             tematyka: '',
             czas_trwania: '',
             wymagania: '',
@@ -83,6 +87,7 @@ export default function OrganizationOffersCreatePage() {
                 projekt: Number(preselectProject),
                 tytul_oferty: data.tytul_oferty,
                 lokalizacja: data.lokalizacja,
+                data: data.data || undefined,
                 tematyka: data.tematyka || undefined,
                 czas_trwania: data.czas_trwania || undefined,
                 wymagania: data.wymagania || undefined,

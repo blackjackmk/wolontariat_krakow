@@ -119,6 +119,9 @@ export default function OrganizationOffersListPage() {
             {ownOffers.map(o => (
               <li key={o.id} className="rounded border bg-white p-4">
                 <div className="font-medium">{o.tytul_oferty}</div>
+                {o.data && (
+                  <div className="text-xs text-gray-600">Data: {new Date(o.data + 'T00:00:00').toLocaleDateString('pl-PL', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                )}
                 <div className="text-sm text-gray-600">Projekt: {o.projekt.nazwa_projektu}</div>
                 <div className="text-sm">Status: {o.czy_ukonczone ? 'Ukończone' : 'Otwarte'}</div>
                 <div className="text-sm">Wolontariusz: {o.wolontariusz ? o.wolontariusz.username : 'Brak'}</div>

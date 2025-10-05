@@ -125,6 +125,11 @@ export default function VolunteerOffersPage() {
                 />
                 <div className="p-4 pt-0 gap-2 flex flex-col grow">
                   <div className="font-semibold leading-tight">{oferta.tytul_oferty}</div>
+                  {oferta.data && (
+                    <div className="text-xs text-gray-600">
+                      Data: {new Date(oferta.data + 'T00:00:00').toLocaleDateString('pl-PL', { year: 'numeric', month: 'long', day: 'numeric' })}
+                    </div>
+                  )}
                   <div className="text-xs text-gray-600">
                     {oferta.organizacja.nazwa_organizacji} • {oferta.projekt.nazwa_projektu}
                   </div>

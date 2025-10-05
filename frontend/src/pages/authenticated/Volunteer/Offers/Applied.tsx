@@ -43,6 +43,7 @@ export default function VolunteerAppliedOffersPage() {
                   <th className="py-2 pr-3">Tytuł</th>
                   <th className="py-2 pr-3">Projekt</th>
                   <th className="py-2 pr-3">Organizacja</th>
+                  <th className="py-2 pr-3">Data</th>
                   <th className="py-2 pr-3">Status</th>
                   <th className="py-2 pr-3">Akcje</th>
                 </tr>
@@ -53,6 +54,7 @@ export default function VolunteerAppliedOffersPage() {
                     <td className="py-2 pr-3">{o.tytul_oferty}</td>
                     <td className="py-2 pr-3">{o.projekt.nazwa_projektu}</td>
                     <td className="py-2 pr-3">{o.organizacja.nazwa_organizacji}</td>
+                    <td className="py-2 pr-3">{o.data ? new Date(o.data + 'T00:00:00').toLocaleDateString('pl-PL', { year: 'numeric', month: '2-digit', day: '2-digit' }) : '—'}</td>
                     <td className="py-2 pr-3">{o.czy_ukonczone ? 'Ukończone' : 'Otwarte'}</td>
                     <td className="py-2 pr-3">
                       <Button
