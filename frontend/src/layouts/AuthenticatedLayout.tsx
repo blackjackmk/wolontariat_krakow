@@ -15,7 +15,10 @@ export default function AuthenticatedLayout() {
       {mobile && <UserMenu variant="mobile" onLogout={() => setOpen(false)} />}
       <Link className="text-gray-700 hover:text-black" to="/dashboard" onClick={() => setOpen(false)}>Dashboard</Link>
       {user?.rola === 'wolontariusz' && (
-        <Link className="text-gray-700 hover:text-black" to="/volunteer/offers" onClick={() => setOpen(false)}>Oferty</Link>
+        <>
+          <Link className="text-gray-700 hover:text-black" to="/volunteer/offers" onClick={() => setOpen(false)}>Oferty</Link>
+          <Link className="text-gray-700 hover:text-black" to="/volunteer/applied-offers" onClick={() => setOpen(false)}>Zgłoszone</Link>
+        </>
       )}
       {user?.rola === 'koordynator' && (
         <Link className="text-gray-700 hover:text-black" to="/coordinator/projects" onClick={() => setOpen(false)}>Projekty</Link>

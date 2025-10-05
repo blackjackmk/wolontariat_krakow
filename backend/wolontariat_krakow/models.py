@@ -5,6 +5,7 @@ from django.utils import timezone
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from io import BytesIO
+from django.core.files.base import ContentFile
 
 
 # ---Organizacja---
@@ -57,10 +58,11 @@ class Uzytkownik(AbstractUser):
         pdf = canvas.Canvas(buffer, pagesize=A4)
         width, height = A4
 
-        pdf.setFont("Calibri-Bold", 20)
+        # Use built-in fonts to avoid missing font errors
+        pdf.setFont("Helvetica-Bold", 20)
         pdf.drawCentredString(width / 2, height - 100, "Zaświadczenie ukończenia zleceń")
 
-        pdf.setFont("Calibri", 14)
+        pdf.setFont("Helvetica", 14)
         pdf.drawString(100, height - 150, f"Wolontariusz: {self.username}")
         pdf.drawString(100, height - 170, f"E-mail: {self.email}")
 

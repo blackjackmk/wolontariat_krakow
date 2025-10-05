@@ -16,6 +16,7 @@ urlpatterns = [
     path('auth/register/', views.register, name='register'),
     path('auth/login/', views.login, name='login'),
     path('auth/logout/', views.logout, name='logout'),
+    path('auth/certificate/', views.certificate, name='certificate'),
 
     # Keep DRF's built-in session auth for admin
     path('auth/', include('rest_framework.urls')),

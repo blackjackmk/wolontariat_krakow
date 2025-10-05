@@ -78,3 +78,22 @@ export async function getMyOffers(): Promise<Oferta[]> {
   const items = Array.isArray(res.data) ? res.data : res.data?.results || [];
   return items.map(mapOfertaFromApi);
 }
+
+export async function downloadOfferCertificate(offerId: number): Promise<void> {
+  const res = await api.get(`offers/${offerId}/certificate/`, { responseType: 'blob' });
+  const blob = new Blob([res.data], { type: 'application/pdf' });
+  const disposition = res.headers['content-disposition'] as string | undefined;
+  let filename = `zaswiadczenie_oferta_${offerId}.pdf`;
+  if (disposition) {
+    const match = disposition.match(/filename="?([^";]+)"?/i);
+    if (match && match[1]) filename = match[1];
+  }
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.URL.revokeObjectURL(url);
+}

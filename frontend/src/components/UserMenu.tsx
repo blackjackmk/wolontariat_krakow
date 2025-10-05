@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 
 type Props = {
@@ -46,7 +47,10 @@ export default function UserMenu({ variant = 'desktop', onLogout }: Props) {
             <div className="text-xs text-gray-500 truncate" title={user.email}>{user.email}</div>
           </div>
         </div>
-        <div className="pt-3 hidden md:visible">
+        <div className="pt-3 space-y-2">
+          <Link className="text-gray-700 hover:text-black block" to="/volunteer/applied-offers" onClick={() => onLogout?.()}>
+            Zgłoszone oferty
+          </Link>
           <button
             className="text-gray-700 hover:text-black"
             onClick={() => {
@@ -84,7 +88,12 @@ export default function UserMenu({ variant = 'desktop', onLogout }: Props) {
               <div className="text-xs text-gray-500 truncate" title={user.email}>{user.email}</div>
             </div>
           </div>
-          <div className="pt-3">
+          <div className="pt-3 space-y-2">
+            <Button asChild variant="outline" className="w-full justify-start">
+              <Link to="/volunteer/applied-offers" onClick={() => setOpen(false)}>
+                Zgłoszone oferty
+              </Link>
+            </Button>
             <Button
               variant="outline"
               className="w-full justify-start"

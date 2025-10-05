@@ -9,7 +9,11 @@ from django.contrib.auth import authenticate
 from django.http import HttpResponse
 from django.core.files import File
 from django.conf import settings
+from io import BytesIO
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
 from wolontariat_krakow.models import Projekt, Oferta, Uzytkownik, Organizacja, Recenzja
+from django.http import HttpResponse
 from .serializers import (
     ProjektSerializer, OfertaSerializer, OfertaCreateSerializer,
     UzytkownikSerializer, OrganizacjaSerializer,
@@ -111,6 +115,18 @@ class OfertaViewSet(viewsets.ModelViewSet):
                 Q(wymagania__icontains=search)
             )
             
+            # Only offers with no assigned volunteers via Zlecenie
+            queryset = queryset.filter(~Q(zlecenia__wolontariusz__isnull=False))
+
+        # Filter by completion only when explicitly requested.
+        # This avoids breaking detail actions (e.g., certificates for completed offers).
+        completed = self.request.query_params.get('completed')
+        if completed is not None:
+            if completed.lower() == 'true':
+                queryset = queryset.filter(czy_ukonczone=True)
+            else:
+                queryset = queryset.filter(czy_ukonczone=False)
+
         return queryset
 
     def perform_create(self, serializer):
@@ -145,6 +161,53 @@ class OfertaViewSet(viewsets.ModelViewSet):
 
         serializer = OfertaSerializer(offer)
         return Response(serializer.data)
+
+    @action(detail=True, methods=['get'], permission_classes=[IsAuthenticated])
+    def certificate(self, request, pk=None):
+        """Generate a per-offer PDF certificate (volunteers only).
+
+        Conditions:
+        - requester role must be 'wolontariusz'
+        - offer must be completed (czy_ukonczone=True)
+        - requester must be assigned to the offer (offer.wolontariusz = user)
+        """
+        offer = self.get_object()
+
+        if request.user.rola != 'wolontariusz':
+            return Response({'error': 'Only volunteers can download certificates'}, status=status.HTTP_403_FORBIDDEN)
+
+        if not offer.czy_ukonczone:
+            return Response({'error': 'Certificate available after completion'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if offer.wolontariusz_id != request.user.id:
+            return Response({'error': 'You are not assigned to this offer'}, status=status.HTTP_403_FORBIDDEN)
+
+        # Generate a simple PDF using standard fonts
+        buffer = BytesIO()
+        pdf = canvas.Canvas(buffer, pagesize=A4)
+        width, height = A4
+
+        pdf.setFont('Helvetica-Bold', 20)
+        pdf.drawCentredString(width / 2, height - 100, 'Zaświadczenie ukończenia')
+
+        pdf.setFont('Helvetica', 14)
+        pdf.drawString(100, height - 150, f"Wolontariusz: {request.user.get_full_name() or request.user.username}")
+        pdf.drawString(100, height - 170, f"E-mail: {request.user.email}")
+
+        pdf.drawString(100, height - 200, 'Szczegóły oferty:')
+        pdf.drawString(120, height - 220, f"Tytuł: {offer.tytul_oferty}")
+        pdf.drawString(120, height - 240, f"Projekt: {offer.projekt.nazwa_projektu}")
+        pdf.drawString(120, height - 260, f"Organizacja: {offer.organizacja.nazwa_organizacji}")
+
+        pdf.showPage()
+        pdf.save()
+        buffer.seek(0)
+
+        resp = HttpResponse(buffer.read(), content_type='application/pdf')
+        safe_title = ''.join(ch for ch in offer.tytul_oferty if ch.isalnum() or ch in (' ', '-', '_')).strip().replace(' ', '_')
+        filename = f"zaswiadczenie_oferta_{offer.id}_{safe_title or 'oferta'}.pdf"
+        resp['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return resp
 
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     def approve(self, request, pk=None):
@@ -487,3 +550,20 @@ def logout(request):
         request.auth.delete()
 
     return Response({'message': 'Successfully logged out'})
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def certificate(request):
+    """
+    Generate and download a PDF certificate for the current user
+    based on completed assignments.
+    """
+    user: Uzytkownik = request.user  # type: ignore
+    try:
+        content_file = user.certyfikat_gen()
+        resp = HttpResponse(content_file.read(), content_type='application/pdf')
+        filename = f"zaswiadczenie_{user.username}.pdf"
+        resp['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return resp
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

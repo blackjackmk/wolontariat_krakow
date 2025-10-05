@@ -12,6 +12,7 @@ import Login from './pages/guest/Login/Index';
 import Register from './pages/guest/Register/Index';
 import { AuthProvider } from './hooks/useAuth';
 import VolunteerOffersPage from './pages/authenticated/Volunteer/Offers/Index';
+import VolunteerAppliedOffersPage from './pages/authenticated/Volunteer/Offers/Applied';
 import CoordinatorProjectsPage from './pages/authenticated/Coordinator/Projects/Index';
 import OrganizationProjectsPage from './pages/authenticated/Organization/Projects/Index';
 import OrganizationProjectsCreatePage from './pages/authenticated/Organization/Projects/Create';
@@ -54,6 +55,14 @@ export default function App() {
               element={
                 <RoleRoute allow={["wolontariusz"]}>
                   <VolunteerOffersPage />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="/volunteer/applied-offers"
+              element={
+                <RoleRoute allow={["wolontariusz"]}>
+                  <VolunteerAppliedOffersPage />
                 </RoleRoute>
               }
             />

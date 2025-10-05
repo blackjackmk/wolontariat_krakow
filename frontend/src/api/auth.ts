@@ -39,3 +39,23 @@ export async function logoutApi(): Promise<void> {
   }
 }
 
+export async function downloadCertificate(): Promise<void> {
+  const res = await api.get('auth/certificate/', { responseType: 'blob' });
+  const blob = new Blob([res.data], { type: 'application/pdf' });
+  // Try to infer filename from Content-Disposition
+  const disposition = res.headers['content-disposition'] as string | undefined;
+  let filename = 'zaswiadczenie.pdf';
+  if (disposition) {
+    const match = disposition.match(/filename="?([^";]+)"?/i);
+    if (match && match[1]) filename = match[1];
+  }
+
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.URL.revokeObjectURL(url);
+}
