@@ -4,13 +4,15 @@ import Logo from '@/components/ui/logo';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
+import UserMenu from '@/components/UserMenu';
 
 export default function AuthenticatedLayout() {
   const { user, logout } = useAuth();
   const [open, setOpen] = useState(false);
 
-  const NavLinks = () => (
+  const NavLinks = ({ mobile = false }: { mobile?: boolean }) => (
     <>
+      {mobile && <UserMenu variant="mobile" onLogout={() => setOpen(false)} />}
       <Link className="text-gray-700 hover:text-black" to="/dashboard" onClick={() => setOpen(false)}>Dashboard</Link>
       {user?.rola === 'wolontariusz' && (
         <Link className="text-gray-700 hover:text-black" to="/volunteer/offers" onClick={() => setOpen(false)}>Oferty</Link>
@@ -21,7 +23,17 @@ export default function AuthenticatedLayout() {
       {user?.rola === 'organizacja' && (
         <Link className="text-gray-700 hover:text-black" to="/organization/projects" onClick={() => setOpen(false)}>Projekty</Link>
       )}
-      <button className="text-gray-700 hover:text-black" onClick={() => { setOpen(false); logout(); }}>Wyloguj</button>
+      {!mobile && <UserMenu variant="desktop" onLogout={undefined} />}
+      {mobile && (
+        <button
+            className="text-gray-700 hover:text-black text-left"
+            onClick={() => {
+              logout();
+            }}
+          >
+            Wyloguj
+        </button>
+      )}
     </>
   );
 
@@ -60,7 +72,7 @@ export default function AuthenticatedLayout() {
                 <X />
               </Button>
             </div>
-            <NavLinks />
+            <NavLinks mobile />
           </div>
         </div>
       )}
