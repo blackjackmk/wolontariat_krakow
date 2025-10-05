@@ -5,3 +5,4 @@ gunicorn
 python-dotenv
 django-cors-headers
 django-filter
+reportlab

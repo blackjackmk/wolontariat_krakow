@@ -6,6 +6,9 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from django.db.models import Q
 from django.contrib.auth import authenticate
+from django.http import HttpResponse
+from django.core.files import File
+from django.conf import settings
 from wolontariat_krakow.models import Projekt, Oferta, Uzytkownik, Organizacja, Recenzja
 from .serializers import (
     ProjektSerializer, OfertaSerializer, OfertaCreateSerializer,
@@ -13,6 +16,9 @@ from .serializers import (
     RecenzjaSerializer, RecenzjaCreateSerializer
 )
 from .permissions import IsOrganization, IsOwnerOrReadOnly
+import os
+
+
 
 class ProjektViewSet(viewsets.ModelViewSet):
     serializer_class = ProjektSerializer
@@ -247,6 +253,85 @@ class UzytkownikViewSet(viewsets.ReadOnlyModelViewSet):
         volunteers = Uzytkownik.objects.filter(rola='wolontariusz')
         serializer = UzytkownikSerializer(volunteers, many=True)
         return Response(serializer.data)
+    
+    @action(detail=True, methods=['get'])
+    def certificate(self, request, pk=None):
+        """
+        Generate and download a certificate for the volunteer's completed offers
+        """
+        user = self.get_object()
+        
+        # Check if the requesting user is authorized to access this certificate
+        if request.user != user and request.user.rola not in ['organizacja', 'koordynator']:
+            return Response(
+                {'error': 'You are not authorized to view this certificate'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+            
+        # Check if the user is a volunteer
+        if user.rola != 'wolontariusz':
+            return Response(
+                {'error': 'Certificates are only available for volunteers'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        # Check if the volunteer has any completed assignments
+        if not user.zlecenia.filter(czy_ukonczone=True).exists():
+            return Response(
+                {'error': 'This volunteer has no completed assignments'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+            
+        try:
+            # Generate the certificate PDF
+            pdf_file = user.certyfikat_gen()
+            
+            # Create the HTTP response with PDF content
+            response = HttpResponse(pdf_file, content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="certificate_{user.username}.pdf"'
+            return response
+            
+        except Exception as e:
+            return Response(
+                {'error': f'Error generating certificate: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def my_certificate(self, request):
+        """
+        Generate and download certificate for the current user
+        """
+        user = request.user
+        
+        # Check if the user is a volunteer
+        if user.rola != 'wolontariusz':
+            return Response(
+                {'error': 'Certificates are only available for volunteers'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        # Check if the volunteer has any completed assignments
+        if not user.zlecenia.filter(czy_ukonczone=True).exists():
+            return Response(
+                {'error': 'You have no completed assignments yet'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+            
+        try:
+            # Generate the certificate PDF
+            pdf_file = user.certyfikat_gen()
+            
+            # Create the HTTP response with PDF content
+            response = HttpResponse(pdf_file, content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="certificate_{user.username}.pdf"'
+            return response
+            
+        except Exception as e:
+            return Response(
+                {'error': f'Error generating certificate: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 class OrganizacjaViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = OrganizacjaSerializer
