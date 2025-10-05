@@ -12,6 +12,7 @@ from django.conf import settings
 from io import BytesIO
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
+from wolontariat_krakow.pdf_utils import get_pl_font_names
 from wolontariat_krakow.models import Projekt, Oferta, Uzytkownik, Organizacja, Recenzja
 from django.http import HttpResponse
 from .serializers import (
@@ -169,7 +170,8 @@ class OfertaViewSet(viewsets.ModelViewSet):
         Conditions:
         - requester role must be 'wolontariusz'
         - offer must be completed (czy_ukonczone=True)
-        - requester must be assigned to the offer (offer.wolontariusz = user)
+        - requester must be assigned to the offer
+          (either as Oferta.wolontariusz or via Zlecenie participation)
         """
         offer = self.get_object()
 
@@ -179,7 +181,10 @@ class OfertaViewSet(viewsets.ModelViewSet):
         if not offer.czy_ukonczone:
             return Response({'error': 'Certificate available after completion'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if offer.wolontariusz_id != request.user.id:
+        # Validate assignment: allow either direct FK assignment or Zlecenie participation
+        assigned_direct = (offer.wolontariusz_id == request.user.id)
+        assigned_via_zlecenie = offer.zlecenia.filter(wolontariusz=request.user).exists()
+        if not (assigned_direct or assigned_via_zlecenie):
             return Response({'error': 'You are not assigned to this offer'}, status=status.HTTP_403_FORBIDDEN)
 
         # Generate a simple PDF using standard fonts
@@ -187,10 +192,11 @@ class OfertaViewSet(viewsets.ModelViewSet):
         pdf = canvas.Canvas(buffer, pagesize=A4)
         width, height = A4
 
-        pdf.setFont('Helvetica-Bold', 20)
+        regular_font, bold_font = get_pl_font_names()
+        pdf.setFont(bold_font, 20)
         pdf.drawCentredString(width / 2, height - 100, 'Zaświadczenie ukończenia')
 
-        pdf.setFont('Helvetica', 14)
+        pdf.setFont(regular_font, 14)
         pdf.drawString(100, height - 150, f"Wolontariusz: {request.user.get_full_name() or request.user.username}")
         pdf.drawString(100, height - 170, f"E-mail: {request.user.email}")
 

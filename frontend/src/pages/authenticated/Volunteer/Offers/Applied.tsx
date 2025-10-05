@@ -22,6 +22,17 @@ export default function VolunteerAppliedOffersPage() {
     return [...offers].sort((a, b) => Number(b.czy_ukonczone) - Number(a.czy_ukonczone));
   }, [offers]);
 
+  const isAssigned = (o: Oferta): boolean => {
+    if (!user) return false;
+    if (o.wolontariusze && Array.isArray(o.wolontariusze)) {
+      return o.wolontariusze.some((w) => w.id === user.id);
+    }
+    if (o.wolontariusz) {
+      return o.wolontariusz.id === user.id;
+    }
+    return false;
+  };
+
   if (loading) return <div>Ładowanie…</div>;
 
   return (
@@ -60,9 +71,22 @@ export default function VolunteerAppliedOffersPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        disabled={!o.czy_ukonczone}
-                        onClick={() => downloadOfferCertificate(o.id)}
-                        title={o.czy_ukonczone ? 'Pobierz certyfikat' : 'Certyfikat dostępny po ukończeniu'}
+                        disabled={!o.czy_ukonczone || !isAssigned(o)}
+                        onClick={async () => {
+                          try {
+                            await downloadOfferCertificate(o.id);
+                          } catch (err: any) {
+                            const detail = err?.response?.data?.detail || err?.response?.data?.error || err?.message;
+                            window.alert(detail || 'Nie udało się pobrać certyfikatu. Upewnij się, że jesteś przypisany do oferty.');
+                          }
+                        }}
+                        title={
+                          !o.czy_ukonczone
+                            ? 'Certyfikat dostępny po ukończeniu'
+                            : isAssigned(o)
+                              ? 'Pobierz certyfikat'
+                              : 'Certyfikat dostępny tylko dla przypisanych wolontariuszy'
+                        }
                       >
                         Pobierz certyfikat
                       </Button>

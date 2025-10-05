@@ -4,6 +4,7 @@ from django.core.validators import RegexValidator
 from django.utils import timezone
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
+from .pdf_utils import get_pl_font_names
 from io import BytesIO
 from django.core.files.base import ContentFile
 
@@ -59,10 +60,11 @@ class Uzytkownik(AbstractUser):
         pdf = canvas.Canvas(buffer, pagesize=A4)
         width, height = A4
 
-        pdf.setFont("Arial-Bold", 20)
+        regular_font, bold_font = get_pl_font_names()
+        pdf.setFont(bold_font, 20)
         pdf.drawCentredString(width / 2, height - 100, "Zaświadczenie ukończenia zleceń")
 
-        pdf.setFont("Arial", 14)
+        pdf.setFont(regular_font, 14)
         pdf.drawString(100, height - 150, f"Wolontariusz: {self.username}")
         pdf.drawString(100, height - 170, f"E-mail: {self.email}")
 
