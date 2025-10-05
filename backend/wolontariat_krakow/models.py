@@ -31,9 +31,7 @@ class Organizacja(models.Model):
 class Uzytkownik(AbstractUser):
     telefon_validator = RegexValidator(regex=r'^\d{9}$', message="Numer telefonu musi składać się z dokładnie 9 cyfr.")
 
-    # ✅ WAŻNE: Email musi być unique gdy używasz go jako USERNAME_FIELD
     email = models.EmailField(unique=True)
-    
 
     nr_telefonu = models.CharField(
         max_length=9, validators=[telefon_validator],
@@ -75,6 +73,7 @@ class Oferta(models.Model):
     wolontariusz = models.ForeignKey(Uzytkownik, on_delete=models.SET_NULL, null=True, blank=True, related_name='oferty')
     czy_ukonczone = models.BooleanField(default=False)
 
+
     def __str__(self):
         return self.tytul_oferty
 
@@ -98,3 +97,18 @@ class Wiadomosc(models.Model):
 
     def __str__(self):
         return f"Wiadomość od {self.nadawca} do {self.odbiorca}"
+
+class Recenzja(models.Model):
+    organizacja = models.ForeignKey('Organizacja', on_delete=models.CASCADE, related_name='recenzje')
+    wolontariusz = models.ForeignKey('Uzytkownik', on_delete=models.CASCADE, related_name='recenzje')
+    oferta = models.ForeignKey('Oferta', on_delete=models.SET_NULL, null=True, blank=True, related_name='recenzje')
+    ocena = models.PositiveSmallIntegerField()
+    komentarz = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        unique_together = ('oferta', 'organizacja')
+
+    def __str__(self):
+        return f"Recenzja {self.ocena} — {self.wolontariusz} by {self.organizacja}"

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
-from wolontariat_krakow.models import Projekt, Oferta, Uzytkownik, Organizacja
+from wolontariat_krakow.models import Projekt, Oferta, Uzytkownik, Organizacja, Recenzja
 
 class OrganizacjaSerializer(serializers.ModelSerializer):
     class Meta:
@@ -65,3 +65,60 @@ class RegistrationSerializer(serializers.ModelSerializer):
         validated_data.pop('password2')
         user = Uzytkownik.objects.create_user(**validated_data)
         return user
+
+class RecenzjaSerializer(serializers.ModelSerializer):
+    organizacja = serializers.StringRelatedField(read_only=True)
+    wolontariusz = serializers.StringRelatedField(read_only=True)
+    oferta = serializers.PrimaryKeyRelatedField(queryset=Oferta.objects.all(), required=False, allow_null=True)
+
+    class Meta:
+        model = Recenzja
+        fields = ['id', 'organizacja', 'wolontariusz', 'oferta', 'ocena', 'komentarz', 'created_at']
+        read_only_fields = ['id', 'organizacja', 'wolontariusz', 'created_at']
+
+class RecenzjaCreateSerializer(serializers.ModelSerializer):
+    oferta = serializers.PrimaryKeyRelatedField(queryset=Oferta.objects.all(), required=False, allow_null=True)
+
+    class Meta:
+        model = Recenzja
+        fields = ['oferta', 'ocena', 'komentarz']
+
+    def validate_ocena(self, value):
+        if not (1 <= value <= 5):
+            raise serializers.ValidationError("Ocena musi być liczbą od 1 do 5.")
+        return value
+
+    def validate(self, data):
+        request = self.context.get('request')
+        user = request.user
+        # must be organization
+        if not user or getattr(user, 'rola', None) != 'organizacja':
+            raise serializers.ValidationError("Tylko organizacje mogą wystawiać recenzje.")
+
+        oferta = data.get('oferta', None)
+        if oferta:
+            # check oferta belongs to this org
+            if oferta.organizacja != user.organizacja:
+                raise serializers.ValidationError("Ta oferta nie należy do Twojej organizacji.")
+            # check that offer is completed/approved
+            if not oferta.czy_ukonczone:
+                raise serializers.ValidationError("Można ocenić wolontariusza tylko po zakończeniu oferty.")
+            # check that the volunteer is set on the offer
+            if not oferta.wolontariusz:
+                raise serializers.ValidationError("Nie ma przypisanego wolontariusza do tej oferty.")
+            # prevent duplicate review for same oferta by same organization (if desired)
+            if Recenzja.objects.filter(oferta=oferta, organizacja=user.organizacja).exists():
+                raise serializers.ValidationError("Recenzja dla tej oferty już istnieje.")
+            # set the wolontariusz field from oferta
+            data['wolontariusz'] = oferta.wolontariusz
+        else:
+            # if no oferta provided, require wolontariusz id in context or explicit param?
+            # For safety, enforce oferta must be provided
+            raise serializers.ValidationError("Musisz podać 'oferta' aby ocenić wolontariusza.")
+        return data
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        org = request.user.organizacja
+        validated_data['organizacja'] = org
+        return super().create(validated_data)

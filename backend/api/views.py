@@ -3,14 +3,16 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
 from rest_framework.authtoken.models import Token
+from rest_framework.response import Response
 from django.db.models import Q
 from django.contrib.auth import authenticate
-from wolontariat_krakow.models import Projekt, Oferta, Uzytkownik, Organizacja
+from wolontariat_krakow.models import Projekt, Oferta, Uzytkownik, Organizacja, Recenzja
 from .serializers import (
     ProjektSerializer, OfertaSerializer, OfertaCreateSerializer,
-    UzytkownikSerializer, OrganizacjaSerializer
+    UzytkownikSerializer, OrganizacjaSerializer,
+    RecenzjaSerializer, RecenzjaCreateSerializer
 )
-
+from .permissions import IsOrganization, IsOwnerOrReadOnly
 
 class ProjektViewSet(viewsets.ModelViewSet):
     serializer_class = ProjektSerializer
@@ -206,6 +208,36 @@ class OrganizacjaViewSet(viewsets.ReadOnlyModelViewSet):
         projects = organization.projekty.all()
         serializer = ProjektSerializer(projects, many=True)
         return Response(serializer.data)
+
+class RecenzjaViewSet(viewsets.ModelViewSet):
+    """
+    create: organization posts a review for a volunteer (via oferta)
+    list: public list (or restricted) — we'll allow read for any, write only for org
+    update/destroy: only the org that created the review may change it
+    """
+    queryset = Recenzja.objects.select_related('organizacja', 'wolontariusz', 'oferta').all()
+    permission_classes = [IsAuthenticatedOrReadOnly := __import__('rest_framework.permissions').permissions.IsAuthenticatedOrReadOnly]  # lazy import to avoid extra top import
+
+    def get_permissions(self):
+        if self.action in ['create']:
+            return [IsAuthenticated(), IsOrganization()]
+        if self.action in ['update', 'partial_update', 'destroy']:
+            return [IsAuthenticated(), IsOwnerOrReadOnly()]
+        return [AllowAny()]
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return RecenzjaCreateSerializer
+        return RecenzjaSerializer
+
+    # optionally restrict list to volunteers' profile or pagination/filtering
+    def get_queryset(self):
+        qs = super().get_queryset()
+        # Allow filtering by wolontariusz id via ?wolontariusz=123
+        wol_id = self.request.query_params.get('wolontariusz')
+        if wol_id:
+            qs = qs.filter(wolontariusz__id=wol_id)
+        return qs
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
