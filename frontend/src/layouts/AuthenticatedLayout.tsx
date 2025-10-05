@@ -26,8 +26,9 @@ export default function AuthenticatedLayout() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-100 text-gray-900">
-      <header className="sticky top-0 z-40 border-b bg-white">
+    <div className="min-h-screen bg-gradient-to-b from-primary/5 via-background to-secondary/5 text-gray-900">
+      <header className="sticky top-0 z-40 border-b bg-white/95 backdrop-blur">
+        <div className="h-1 bg-gradient-to-r from-primary via-accent to-secondary" />
         <div className="mx-auto max-w-5xl px-4 py-3 flex items-center gap-4">
           <Link to="/" className="shrink-0">
             <Logo />

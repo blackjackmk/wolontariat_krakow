@@ -3,13 +3,12 @@ import { useAuth } from '@/hooks/useAuth';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getProjects } from '@/api/projects';
 import { getUsers } from '@/api/users';
-import { getOffers } from '@/api/offers';
+import { getOffers, updateOffer } from '@/api/offers';
 import { AutoForm } from '@/components/ui/autoform';
 import { SubmitButton } from '@/components/ui/autoform/components/SubmitButton';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ZodProvider, fieldConfig } from '@autoform/zod';
 import z from 'zod';
-import { mockOferty } from '@/mock-data/data';
 
 const offerSchema = z.object({
   tytul_oferty: z.string().min(1).max(255).superRefine(
@@ -17,6 +16,9 @@ const offerSchema = z.object({
   ),
   projekt_id: z.string().min(1).superRefine(
     fieldConfig({ label: 'Projekt' })
+  ),
+  lokalizacja: z.string().min(1).superRefine(
+    fieldConfig({ label: 'Lokalizacja', inputProps: { placeholder: 'np. Kraków' } })
   ),
   wolontariusz_id: z.string().optional().superRefine(
     fieldConfig({ label: 'Wolontariusz (opcjonalnie)' })
@@ -63,24 +65,24 @@ export default function OrganizationOffersEditPage() {
           defaultValues={{
             tytul_oferty: offer.tytul_oferty,
             projekt_id: String(offer.projekt.id),
+            lokalizacja: offer.lokalizacja ?? '',
             wolontariusz_id: offer.wolontariusz ? String(offer.wolontariusz.id) : '',
             czy_ukonczone: offer.czy_ukonczone,
           }}
-          onSubmit={(data) => {
-            const idx = mockOferty.findIndex(o => o.id === id);
+          onSubmit={async (data) => {
             const projekt = projects.find(p => p.id === Number(data.projekt_id));
-            const wol = data.wolontariusz_id ? volunteers.find(v => v.id === Number(data.wolontariusz_id)) ?? null : null;
-            if (idx >= 0 && projekt) {
-              mockOferty[idx] = {
-                ...mockOferty[idx],
+            if (!projekt) return;
+            try {
+              await updateOffer(id, {
                 tytul_oferty: data.tytul_oferty,
-                projekt,
-                organizacja: user.organizacja!,
-                wolontariusz: wol,
+                projekt: projekt.id,
+                lokalizacja: data.lokalizacja,
+                wolontariusz: data.wolontariusz_id ? Number(data.wolontariusz_id) : null,
                 czy_ukonczone: data.czy_ukonczone,
-              };
+              });
+            } finally {
+              navigate('/organization/offers');
             }
-            navigate('/organization/offers');
           }}
         >
           <SubmitButton>Zapisz</SubmitButton>
@@ -89,4 +91,3 @@ export default function OrganizationOffersEditPage() {
     </Card>
   );
 }
-

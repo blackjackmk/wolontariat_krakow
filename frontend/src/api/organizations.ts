@@ -1,13 +1,12 @@
-// src/api/organizations.ts
-import { mockOrganizacje } from '@/mock-data/data';
+import api from './axios';
 
 export async function getOrganizations(): Promise<Organizacja[]> {
-  // TODO: replace with real API call, e.g. api.get('/organizations/')
-  return Promise.resolve(mockOrganizacje);
+  const res = await api.get('organizations/');
+  const items = Array.isArray(res.data) ? res.data : res.data?.results || [];
+  return items as Organizacja[];
 }
 
 export async function getOrganizationById(id: number): Promise<Organizacja | undefined> {
-  // TODO: replace with real API call, e.g. api.get(`/organizations/${id}/`)
-  return Promise.resolve(mockOrganizacje.find(o => o.id === id));
+  const res = await api.get(`organizations/${id}/`);
+  return res.data as Organizacja;
 }
-
