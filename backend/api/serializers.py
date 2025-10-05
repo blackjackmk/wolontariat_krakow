@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.contrib.auth.password_validation import validate_password
 from wolontariat_krakow.models import Projekt, Oferta, Uzytkownik, Organizacja
 
 class OrganizacjaSerializer(serializers.ModelSerializer):
@@ -46,3 +47,21 @@ class OfertaCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Oferta
         fields = ['projekt', 'tytul_oferty', 'lokalizacja', 'data_wyslania']
+
+class RegistrationSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, validators=[validate_password])
+    password2 = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = Uzytkownik
+        fields = ['username', 'email', 'password', 'password2', 'rola', 'nr_telefonu', 'first_name', 'last_name']
+
+    def validate(self, attrs):
+        if attrs['password'] != attrs['password2']:
+            raise serializers.ValidationError({"password": "Password fields didn't match."})
+        return attrs
+
+    def create(self, validated_data):
+        validated_data.pop('password2')
+        user = Uzytkownik.objects.create_user(**validated_data)
+        return user

@@ -10,4 +10,12 @@ router.register(r'organizations', views.OrganizacjaViewSet, basename='organizati
 
 urlpatterns = [
     path('', include(router.urls)),
+
+	# Authentication endpoints
+    path('auth/register/', views.register, name='register'),
+    path('auth/login/', views.login, name='login'),
+    path('auth/logout/', views.logout, name='logout'),
+
+    # Keep DRF's built-in session auth for admin
+    path('auth/', include('rest_framework.urls')),
 ]
