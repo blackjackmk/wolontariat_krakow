@@ -21,6 +21,7 @@
     "date-fns": "^4.1.0",
     "lucide-react": "^0.544.0",
     "react": "^19.2.0",
+    "react-big-calendar": "^1.19.4",
     "react-day-picker": "^9.11.0",
     "react-dom": "^19.2.0",
     "react-hook-form": "^7.64.0",

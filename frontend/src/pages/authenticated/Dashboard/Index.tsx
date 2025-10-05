@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/card';
 import { useAuth } from '@/hooks/useAuth';
 import { getProjects } from '@/api/projects';
 import { getOffers, getMyOffers } from '@/api/offers';
+import OfferCalendar from '@/components/OfferCalendar';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -53,6 +54,7 @@ export default function Dashboard() {
   const myApplications = myAppliedOffers.length;
   const volunteerOpenOffers = useMemo(() => offers.filter(o => !o.czy_ukonczone).length, [offers]);
   const volunteerRecommended = useMemo(() => offers.slice(0, 3), [offers]);
+  const volunteerCalendarOffers = useMemo(() => offers.filter(o => !o.czy_ukonczone), [offers]);
 
   // Coordinator / Organization metrics
   const orgOpenOffers = useMemo(() => orgOffers.filter(o => !o.czy_ukonczone).length, [orgOffers]);
@@ -71,6 +73,10 @@ export default function Dashboard() {
             <Card className="p-4 bg-secondary/10 border-secondary/20"><div className="text-xs text-secondary">Otwarte oferty</div><div className="text-2xl font-semibold text-secondary">{volunteerOpenOffers}</div></Card>
             <Card className="p-4 bg-accent/10 border-accent/20"><div className="text-xs text-accent">Nadchodzące</div><div className="text-2xl font-semibold text-accent">—</div></Card>
             <Card className="p-4 bg-destructive/10 border-destructive/20"><div className="text-xs text-destructive">Godziny wolontariatu</div><div className="text-2xl font-semibold text-destructive">—</div></Card>
+          </div>
+          <div className="mt-6">
+            <h2 className="text-lg font-semibold mb-2">Kalendarz ofert</h2>
+            <OfferCalendar offers={volunteerCalendarOffers} />
           </div>
           <div className="grid md:grid-cols-2 gap-4">
             <div>
@@ -117,6 +123,10 @@ export default function Dashboard() {
             <Card className="p-4 bg-accent/10 border-accent/20"><div className="text-xs text-accent">Uczestnicy łącznie</div><div className="text-2xl font-semibold text-accent">{totalParticipants}</div></Card>
             <Card className="p-4 bg-destructive/10 border-destructive/20"><div className="text-xs text-destructive">Otwarte oferty</div><div className="text-2xl font-semibold text-destructive">{orgOpenOffers}</div></Card>
           </div>
+          <div className="mt-6">
+            <h2 className="text-lg font-semibold mb-2">Kalendarz wszystkich ofert</h2>
+            <OfferCalendar offers={offers} />
+          </div>
         </>
       )}
 
@@ -127,6 +137,10 @@ export default function Dashboard() {
             <Card className="p-4 bg-secondary/10 border-secondary/20"><div className="text-xs text-secondary">Oferty</div><div className="text-2xl font-semibold text-secondary">{orgOffers.length}</div></Card>
             <Card className="p-4 bg-accent/10 border-accent/20"><div className="text-xs text-accent">Otwarte oferty</div><div className="text-2xl font-semibold text-accent">{orgOpenOffers}</div></Card>
             <Card className="p-4 bg-destructive/10 border-destructive/20"><div className="text-xs text-destructive">Zweryfikowana</div><div className="text-2xl font-semibold text-destructive">{user?.organizacja?.weryfikacja ? 'Tak' : 'Nie'}</div></Card>
+          </div>
+          <div className="mt-6">
+            <h2 className="text-lg font-semibold mb-2">Kalendarz ofert organizacji</h2>
+            <OfferCalendar offers={orgOffers} />
           </div>
         </>
       )}
