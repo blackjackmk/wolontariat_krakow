@@ -46,10 +46,12 @@ class OfertaSerializer(serializers.ModelSerializer):
         model = Oferta
         fields = [
             'id', 'organizacja', 'organizacja_nazwa', 'projekt', 'projekt_nazwa',
-            'tytul_oferty', 'lokalizacja', 'data_wyslania', 'wolontariusz',
-            'wolontariusz_info', 'wolontariusze', 'liczba_uczestnikow', 'czy_ukonczone'
+            'tytul_oferty', 'lokalizacja', 'tematyka', 'czas_trwania', 'wymagania',  # Added new fields
+            'data_wyslania', 'wolontariusz', 'wolontariusz_info', 
+            'wolontariusze', 'liczba_uczestnikow', 'czy_ukonczone'
         ]
         read_only_fields = ['organizacja', 'data_wyslania']
+
 
     # Helpers for multi-assignment via Zlecenie
     def get_wolontariusze(self, obj):
@@ -64,8 +66,11 @@ class OfertaSerializer(serializers.ModelSerializer):
 class OfertaCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Oferta
-        fields = ['projekt', 'tytul_oferty', 'lokalizacja', 'data_wyslania']
-
+        fields = [
+            'projekt', 'tytul_oferty', 'lokalizacja', 
+            'tematyka', 'czas_trwania', 'wymagania',  # Added new fields
+            'data_wyslania'
+        ]
     pass
 
 class RegistrationSerializer(serializers.ModelSerializer):

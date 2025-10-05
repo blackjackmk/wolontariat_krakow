@@ -62,6 +62,11 @@ class ProjektViewSet(viewsets.ModelViewSet):
 class OfertaViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return OfertaCreateSerializer
+        return OfertaSerializer
+
     def get_queryset(self):
         queryset = Oferta.objects.all()
 
@@ -77,32 +82,42 @@ class OfertaViewSet(viewsets.ModelViewSet):
         if lokalizacja:
             queryset = queryset.filter(lokalizacja__icontains=lokalizacja)
 
+        tematyka = self.request.query_params.get('tematyka')
+        if tematyka:
+            queryset = queryset.filter(tematyka__icontains=tematyka)
+            
+        # New filter for duration
+        czas_trwania = self.request.query_params.get('czas_trwania')
+        if czas_trwania:
+            queryset = queryset.filter(czas_trwania__icontains=czas_trwania)
+            
+        # Filter for open offers (with no assigned volunteer)
         tylko_wolne = self.request.query_params.get('tylko_wolne')
         if tylko_wolne and tylko_wolne.lower() == 'true':
-            # Only offers with no assigned volunteers via Zlecenie
-            queryset = queryset.filter(~Q(zlecenia__wolontariusz__isnull=False))
-
-        completed = self.request.query_params.get('completed')
-        if completed and completed.lower() == 'true':
-            queryset = queryset.filter(czy_ukonczone=True)
-        else:
-            queryset = queryset.filter(czy_ukonczone=False)
-
+            queryset = queryset.filter(wolontariusz__isnull=True)
+            
+        # Filter by requirements (search in requirements text)
+        wymagania = self.request.query_params.get('wymagania')
+        if wymagania:
+            queryset = queryset.filter(wymagania__icontains=wymagania)
+            
+        # Add search across multiple fields
+        search = self.request.query_params.get('search')
+        if search:
+            queryset = queryset.filter(
+                Q(tytul_oferty__icontains=search) |
+                Q(lokalizacja__icontains=search) |
+                Q(tematyka__icontains=search) |
+                Q(wymagania__icontains=search)
+            )
+            
         return queryset
 
-    def get_serializer_class(self):
-        if self.action == 'create':
-            return OfertaCreateSerializer
-        return OfertaSerializer
-
     def perform_create(self, serializer):
-        if self.request.user.rola not in ['organizacja', 'koordynator']:
-            raise PermissionError('Only organizations and coordinators can create offers')
-
-        if self.request.user.rola == 'organizacja' and self.request.user.organizacja:
+        if self.request.user.rola in ['organizacja', 'koordynator'] and self.request.user.organizacja:
             serializer.save(organizacja=self.request.user.organizacja)
         else:
-            serializer.save()
+            raise serializers.ValidationError({"error": "Only organization and coordinator users can create offers"})
 
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     def apply(self, request, pk=None):

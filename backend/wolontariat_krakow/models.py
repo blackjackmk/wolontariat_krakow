@@ -98,7 +98,10 @@ class Oferta(models.Model):
     data_wyslania = models.DateTimeField(default=timezone.now)
     wolontariusz = models.ForeignKey(Uzytkownik, on_delete=models.SET_NULL, null=True, blank=True, related_name='oferty')
     czy_ukonczone = models.BooleanField(default=False)
-
+    tematyka = models.CharField(max_length=100, blank=True, help_text="Główna tematyka oferty (np. edukacja, pomoc seniorom)")
+    czas_trwania = models.CharField(max_length=50, blank=True, help_text="Przewidywany czas trwania (np. 2 godziny, 3 dni)")
+    wymagania = models.TextField(blank=True, help_text="Wymagania dla wolontariuszy")
+    
 
     def __str__(self):
         return self.tytul_oferty
