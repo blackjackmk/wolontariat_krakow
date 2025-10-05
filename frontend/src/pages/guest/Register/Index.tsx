@@ -53,7 +53,7 @@ function makeSchema(accountType: RoleType) {
 }
 
 export default function Register() {
-  const { login } = useAuth();
+  const { register } = useAuth();
   const [accountType, setAccountType] = useState<RoleType>('wolontariusz');
 
   const provider = useMemo(() => new ZodProvider(makeSchema(accountType)), [accountType]);
@@ -83,8 +83,15 @@ export default function Register() {
             onSubmit={(data) => {
               const payload = { ...data, rola: accountType } as any;
               console.log('register', payload);
-              // TODO: call backend register, then login
-              login(payload.username, payload.password);
+              // Send required fields to backend register
+              const req = {
+                username: payload.username,
+                email: payload.email,
+                password: payload.password,
+                nr_telefonu: payload.nr_telefonu,
+                rola: accountType,
+              };
+              register(req);
             }}
           >
             <SubmitButton>Zarejestruj</SubmitButton>

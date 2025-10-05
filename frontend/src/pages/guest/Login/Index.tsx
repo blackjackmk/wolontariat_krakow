@@ -9,9 +9,9 @@ import z from "zod";
 const schema = z.object({
     username: z.string().max(255).superRefine(
         fieldConfig({
-            label: 'Nazwa użytkownika',
+            label: 'Email',
             inputProps: {
-                placeholder: 'Jan Kowalski'
+                placeholder: 'jan.kowalski@example.com'
             }
         })
     ),
