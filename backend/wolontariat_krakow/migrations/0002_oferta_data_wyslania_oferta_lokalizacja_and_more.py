@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='oferta',
             name='lokalizacja',
-            field=models.CharField(default='Kraków', max_length=100),
+            field=models.CharField(default='Krakow', max_length=100),
             preserve_default=False,
         ),
         migrations.AlterField(
@@ -39,5 +39,21 @@ class Migration(migrations.Migration):
                 ('oferta', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='zlecenia', to='wolontariat_krakow.oferta')),
                 ('wolontariusz', models.ManyToManyField(limit_choices_to={'rola': 'wolontariusz'}, related_name='zlecenia', to=settings.AUTH_USER_MODEL)),
             ],
+        ),
+        migrations.CreateModel(
+            name='Recenzja',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('ocena', models.PositiveSmallIntegerField()),
+                ('komentarz', models.TextField(blank=True)),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('oferta', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='recenzje', to='wolontariat_krakow.oferta')),
+                ('organizacja', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='recenzje', to='wolontariat_krakow.organizacja')),
+                ('wolontariusz', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='recenzje', to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+                'ordering': ['-created_at'],
+                'unique_together': {('oferta', 'organizacja')},
+            },
         ),
     ]
