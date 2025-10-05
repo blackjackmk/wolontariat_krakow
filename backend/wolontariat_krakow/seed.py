@@ -1,4 +1,4 @@
-from wolontariat_krakow.models import Organizacja, Uzytkownik, Projekt, Oferta, Wiadomosc
+from wolontariat_krakow.models import Organizacja, Uzytkownik, Projekt, Oferta, Zlecenie, Wiadomosc
 from django.contrib.auth.hashers import make_password
 from django.utils import timezone
 import random
@@ -6,6 +6,7 @@ from datetime import timedelta
 
 # --- Wyczyść istniejące dane ---
 Wiadomosc.objects.all().delete()
+Zlecenie.objects.all().delete()
 Oferta.objects.all().delete()
 Projekt.objects.all().delete()
 Uzytkownik.objects.all().delete()
@@ -95,13 +96,25 @@ for tytul in oferty_dane:
             projekt=random.choice(projekty),
             tytul_oferty=tytul,
             lokalizacja="Krakow",
-            data_wyslania=losowa_data,
-            wolontariusz=random.choice(uzytkownicy),
-            czy_ukonczone=random.choice([True, False])
+            data_wyslania=losowa_data
         )
     )
 
 print("Dodano 5 ofert")
+
+# --- Zlecenia ---
+zlecenia = []
+for oferta in oferty:
+    zlec = Zlecenie.objects.create(
+        oferta=oferta,
+        czy_ukonczone=random.choice([True, False]),
+        czy_potwierdzone=random.choice([True, False])
+    )
+    wolontariusze = [u for u in uzytkownicy if u.rola == 'wolontariusz']
+    zlec.wolontariusz.set(random.sample(wolontariusze, k=random.randint(1, min(2, len(wolontariusze)))))
+    zlecenia.append(zlec)
+
+print("Dodano 5 zleceń")
 
 # --- Wiadomości ---
 wiadomosci_dane = [

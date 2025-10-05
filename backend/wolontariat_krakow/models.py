@@ -72,12 +72,20 @@ class Oferta(models.Model):
     tytul_oferty = models.CharField(max_length=100)
     lokalizacja = models.CharField(max_length=100)
     data_wyslania = models.DateTimeField(default=timezone.now())
-    wolontariusz = models.ForeignKey(Uzytkownik, on_delete=models.SET_NULL, null=True, blank=True, related_name='oferty')
-    czy_ukonczone = models.BooleanField(default=False)
 
     def __str__(self):
         return self.tytul_oferty
 
+
+# ---Zlecenie---
+class Zlecenie(models.Model):
+    oferta = models.ForeignKey(Oferta, on_delete=models.CASCADE, related_name='zlecenia')
+    wolontariusz = models.ManyToManyField(Uzytkownik, related_name='zlecenia', limit_choices_to={'rola': 'wolontariusz'})
+    czy_ukonczone = models.BooleanField(default=False)
+    czy_potwierdzone = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Zlecenie: {self.oferta}"
 
 # ---Wiadomosc---
 class Wiadomosc(models.Model):
